@@ -6,7 +6,19 @@ cleanup() {
     # 杀死当前 shell 的所有子进程
     pkill -P $$
     exit
-}
+}// ...existing code...
+# 2. 启动前端
+echo "[2/2] 启动前端服务 (Port: 8088)..."
+# 检查 node_modules
+if [ ! -d "node_modules" ]; then
+    echo "发现前端依赖未安装，正在安装..."
+    # 修改此处：加入 --ignore-engines
+    yarn install --ignore-engines
+fi
+
+# 启动前端 (这将占用当前终端)
+yarn serve
+// ...existing code...
 
 # 捕获退出信号
 trap cleanup SIGINT SIGTERM EXIT
