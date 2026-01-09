@@ -1,0 +1,63 @@
+version: '1.0'
+name: estart-cicd
+displayName: Estart自动部署流水线
+triggers:
+  push:
+    branches:
+      - master
+stages:
+  - name: build-stage
+    displayName: 构建打包
+    strategy: naturally
+    trigger: auto
+    steps:
+      - step: build@nodejs
+        name: build
+        displayName: 前后端构建
+        nodeVersion: 16.20.0
+        commands:
+          - '# 1. 设置镜像源'
+          - npm config set registry https://registry.npmmirror.com
+          - '# 2. 安装前端依赖并构建'
+          - echo "开始构建前端..."
+          - npm install
+          - npm run build:web
+          - '# 3. 安装后端依赖'
+          - echo "开始准备后端..."
+          - cd server
+          - npm install
+          - cd ..
+          - '# 4. 打包产物 (search是前端构建目录, server是后端)'
+          - echo "正在打包..."
+          - tar -zcf release.tar.gz search server
+        artifacts:
+          - name: release-package
+            path: ./release.tar.gz
+
+  - name: deploy-stage
+    displayName: 服务器部署
+    strategy: naturally
+    trigger: auto
+    dependencies: [build-stage]
+    steps:
+      - step: deploy@ssh
+        name: deploy
+        displayName: SSH部署与重启
+        # 请在 Gitee [管理 -> Gitee Go -> 主机组管理] 中创建主机组，并将 ID 填入此处
+        hostGroupID: 'YOUR_HOST_GROUP_ID'
+        script:
+          - '# 定义部署目录'
+          - DEPLOY_DIR="/www/wwwroot/estart"
+          - mkdir -p $DEPLOY_DIR
+          - '# 注意: Gitee Go 的 deploy@ssh 插件主要用于执行命令'
+          - '# 若需传输文件，建议在 build 阶段使用 scp 将压缩包推送到服务器，'
+          - '# 或者在此处使用 wget/curl 从对象存储下载。'
+          - '# 下面演示假设 release.tar.gz 已经传输到了 $DEPLOY_DIR 目录的逻辑:'
+          - cd $DEPLOY_DIR
+          - '# 解压覆盖'
+          - tar -zxf release.tar.gz
+          - '# 重启后端 (需要服务器已安装 pm2: npm i -g pm2)'
+          - cd server
+          - pm2 reload app.js --name estart-server || pm2 start app.js --name estart-server
+          - echo "后端服务已在 8081 端口重启"
+          - '# 前端是静态文件，解压到 search 目录后，请配置 Nginx 指向该目录'
