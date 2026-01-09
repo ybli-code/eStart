@@ -12,7 +12,7 @@ import {
   Message
 } from 'element-ui'
 import local from '@/utils/localStrong';
-import QS from 'querystring';
+import QS from 'qs';
 axios.defaults.paramsSerializer = function (params) {
   return QS.stringify(params);
 };
@@ -40,10 +40,10 @@ axios.interceptors.response.use(response => {
   return response.data
 })
 
-let baseUrl = 'http://localhost:8081' //振兴
-let dreamwqApi = 'http://localhost:8081' //api
+// let baseUrl = 'http://localhost:8081' //振兴
 // let dreamwqApi = 'http://localhost:8081' //api
-// let baseUrl = 'apis/'
+let dreamwqApi = '/apis' //api
+let baseUrl = '/apis'
 
 export default {
   // 登陆
@@ -79,12 +79,17 @@ export default {
 
   //获取实况天气
   getWeather(cid) {
-    return axios.get(`https://widget-api.heweather.net/s6/plugin/h5?key=db9bb478dfb943949c821628a67011e9&location=${cid}&lang=cn`);
+    // return axios.get(`https://widget-api.heweather.net/s6/plugin/h5?key=db9bb478dfb943949c821628a67011e9&location=${cid}&lang=cn`);
+    return axios.get(`${dreamwqApi}/api/weather`).then(res => {
+         // 适配和风天气的返回结构
+         return res.data ? res.data.HeWeather6[0] : {};
+    });
   },
 
   //获取一言
   getYiyan(params) {
-    return axios.get('https://v1.hitokoto.cn/?c=d&c=i&encode=json', params);
+    // return axios.get('https://v1.hitokoto.cn/?c=d&c=i&encode=json', params);
+    return axios.get(`${dreamwqApi}/api/yiyan`);
   },
 
   //百度搜索

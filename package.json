@@ -1,5 +1,5 @@
 {
-  "name": "lingo",
+  "name": "estart",
   "version": "0.2.0",
   "private": true,
   "scripts": {
@@ -16,22 +16,23 @@
     "dayjs": "^1.9.4",
     "element-ui": "^2.14.0",
     "js-base64": "^3.6.0",
-    "vue": "^2.6.12",
+    "qs": "^6.14.1",
+    "vue": "^2.7.16",
     "vue-clipboard2": "^0.3.1",
     "vue-swiper": "^0.5.0",
     "vuedraggable": "^2.24.3",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
-    "global": "^4.4.0",
-    "@vue/cli-plugin-babel": "~4.5.8",
-    "@vue/cli-plugin-router": "~4.5.8",
-    "@vue/cli-service": "~4.5.8",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-router": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "babel-plugin-component": "^1.1.1",
     "cross-env": "^7.0.2",
-    "less": "^3.12.2",
-    "less-loader": "^7.0.2",
-    "vue-template-compiler": "^2.6.12"
+    "global": "^4.4.0",
+    "less": "^4.2.0",
+    "less-loader": "^12.2.0",
+    "vue-template-compiler": "^2.7.16"
   },
   "browserslist": [
     "> 1%",

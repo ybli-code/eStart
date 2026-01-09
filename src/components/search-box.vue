@@ -118,7 +118,7 @@ export default {
   methods: {
     init() {
       let search = this.$store.state.setContent.search || "baidu";
-      this.currSearch = this.searchList.find((v) => v.key == search);
+      this.currSearch = this.searchList.find((v) => v.key == search) || this.searchList[0];
       document.addEventListener(
         "click",
         () => {
@@ -157,9 +157,14 @@ export default {
       this.keyIndex = -1;
       this.keyListHeight = this.keyList.length * 30 + 30 + "px";
       this.$http.baiduSugrec(this.value).then((res) => {
-        let data = res.data;
-        this.keyList = data.g || [];
-        this.keyList = this.keyList.map((item) => item.q);
+        let data = res.data || res;
+        this.keyList = data.g || data.s || [];
+        // 如果是 .g 结构，通常是 [{q: ...}, ...]; 如果是 .s 结构，通常是 ["...", ...]
+        if (data.g) {
+          this.keyList = this.keyList.map((item) => item.q);
+        }
+        // 如果是 .s (mock server返回的)，本身就是字符串数组，不需要 map
+        
         this.keyListHeight = this.keyList.length * 30 + 30 + "px";
       });
     },

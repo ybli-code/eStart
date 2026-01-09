@@ -1,0 +1,33 @@
+{
+  "users": [
+    {
+      "id": 1767961001102,
+      "password": "YWRtaW4=",
+      "createTime": "2026-01-09T12:16:41.102Z",
+      "token": "token_undefined_1767961430816"
+    }
+  ],
+  "configs": {
+    "undefined": {
+      "iconSize": 60,
+      "note": null,
+      "id": "\"\\\"\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\"\\\"\"",
+      "navlist": "[{\"type\":1,\"url\":\"\",\"title\":\"待办事项\",\"key\":\"todo\",\"color\":\"#409eff\",\"id\":1},{\"type\":1,\"url\":\"\",\"title\":\"便笺\",\"key\":\"note\",\"color\":\"#fa8511\",\"id\":2},{\"type\":1,\"url\":\"\",\"title\":\"设置\",\"key\":\"setting\",\"color\":\"#408ef0\",\"id\":3},{\"type\":0,\"url\":\"https://www.tmall.com\",\"title\":\"天猫\",\"key\":\"tmall\",\"color\":\"#ff0030\",\"id\":4},{\"type\":0,\"url\":\"https://www.jd.com\",\"title\":\"京东商城\",\"key\":\"jd\",\"color\":\"#d71912\",\"id\":5},{\"type\":0,\"url\":\"https://music.163.com/\",\"title\":\"网易云音乐\",\"key\":\"music163\",\"color\":\"#f24452\",\"id\":6},{\"type\":0,\"url\":\"https://www.bilibili.com/\",\"title\":\"bilibili\",\"key\":\"bilibili\",\"color\":\"#00b1ff\",\"id\":7},{\"type\":0,\"url\":\"http://iqiyi.com/\",\"title\":\"爱奇艺\",\"key\":\"iqiyi\",\"color\":\"#08db02\",\"id\":8},{\"type\":0,\"url\":\"http://v.qq.com/\",\"title\":\"腾讯视频\",\"key\":\"vqq\",\"color\":\"#ff8903\",\"id\":9},{\"type\":0,\"url\":\"https://weibo.com/\",\"title\":\"微博\",\"key\":\"weibo\",\"color\":\"#e6162d\",\"id\":10},{\"type\":0,\"url\":\"https://www.zhihu.com/\",\"title\":\"知乎\",\"key\":\"zhihu\",\"color\":\"#0084ff\",\"id\":11},{\"type\":0,\"url\":\"https://mail.qq.com/\",\"title\":\"豆瓣\",\"key\":\"douban\",\"color\":\"#00b51d\",\"id\":13},{\"type\":0,\"url\":\"https://mail.qq.com/\",\"title\":\"QQ邮箱\",\"key\":\"email\",\"color\":\"#f57f4f\",\"id\":14},{\"type\":1,\"url\":\"\",\"title\":\"添加\",\"key\":\"add\",\"color\":\"#fa8511\",\"id\":15}]",
+      "todo": "{\"unfinish\":[],\"finish\":[{\"text\":\"111\",\"created\":1767961401879}]}",
+      "wallpaper": "{\"title\":\"Loughrigg Tarn的日出\",\"local\":\"欧洲 英国 英格兰湖区安布尔塞德\",\"src\":\"https://tvax1.sinaimg.cn/large/007Tv3Vmly1gd0yldnd9ej31hc0u047i.jpg\",\"type\":0}",
+      "iconRadius": 20,
+      "iconOpacity": 90,
+      "bgBlur": 0,
+      "themeMode": "light",
+      "sunrise": false,
+      "iconTitle": true,
+      "startAnimation": true,
+      "layout": [
+        3,
+        5
+      ],
+      "yiyan": true,
+      "search": "baidu"
+    }
+  }
+}

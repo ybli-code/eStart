@@ -13,7 +13,7 @@ module.exports = {
     open: true, //配置自动启动浏览器
     proxy: {
       "/apis": {
-        target: "http://106.75.136.242:8088/", //  本地
+        target: "http://localhost:8081/", //  本地
         changeOrigin: true,
         pathRewrite: {
           '^/apis': ''
@@ -26,7 +26,7 @@ module.exports = {
 
   css: {
     // 是否使用css扩展
-    requireModuleExtension: true,
+    // requireModuleExtension: true,
     //   loaderOptions: { // 向 CSS 相关的 loader 传递选项 
     //     less: {
     //         javascriptEnabled: true

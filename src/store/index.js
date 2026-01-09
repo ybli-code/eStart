@@ -214,9 +214,9 @@ export default new Vuex.Store({
           local.set('configId', data.id)
           state.setContent = data || setContent
           state.navList = data.navlist ? JSON.parse(data.navlist) : utils.deepClone(navList)
-          state.wallpaper = JSON.parse(data.wallpaper) || {}
-          state.todo = JSON.parse(data.todo) || {}
-          state.note = JSON.parse(data.note) || [{
+          state.wallpaper = data.wallpaper ? JSON.parse(data.wallpaper) : {}
+          state.todo = data.todo ? JSON.parse(data.todo) : {}
+          state.note = data.note ? JSON.parse(data.note) : [{
             text: "",
             created: dayjs().valueOf(),
           },]
