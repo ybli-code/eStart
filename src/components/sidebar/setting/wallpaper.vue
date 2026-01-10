@@ -20,19 +20,27 @@
         </ul>
       </li>
       <li>
-        <h3>动态</h3>
-        <el-row :gutter="10">
-          <el-col :span="8" v-for="(row, index) of videoList" :key="index">
-            <div
-              :title="`${row.title} ${row.local}`"
-              class="wallpaper-item"
-              @click="selWallpaper(row, 2)"
-              :class="{ active: activeSrc == row.src }"
-            >
-              <video :alt="row.title" :src="row.src" />
-            </div>
-          </el-col>
-        </el-row>
+        <div v-for="(item, index) of dataList" :key="index">
+          <h3>{{ item.title }}</h3>
+          <el-row :gutter="10">
+            <el-col :span="8" v-for="(row, index) of item.data" :key="index">
+              <div
+                :title="`${row.title} ${row.local}`"
+                @click="selWallpaper(row, 0)"
+                class="wallpaper-item"
+                :class="{ active: activeSrc == row.src }"
+              >
+                <el-image
+                  fit="cover"
+                  class="wallpaper-img"
+                  :alt="row.title"
+                  :src="row.src"
+                  lazy
+                ></el-image>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
         <h3>必应</h3>
         <el-row :gutter="10">
           <el-col :span="8">
@@ -80,27 +88,19 @@
             </p>
           </el-col>
         </el-row>
-        <div v-for="(item, index) of dataList" :key="index">
-          <h3>{{ item.title }}</h3>
-          <el-row :gutter="10">
-            <el-col :span="8" v-for="(row, index) of item.data" :key="index">
-              <div
-                :title="`${row.title} ${row.local}`"
-                @click="selWallpaper(row, 0)"
-                class="wallpaper-item"
-                :class="{ active: activeSrc == row.src }"
-              >
-                <el-image
-                  fit="cover"
-                  class="wallpaper-img"
-                  :alt="row.title"
-                  :src="row.src"
-                  lazy
-                ></el-image>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
+        <h3>动态</h3>
+        <el-row :gutter="10">
+          <el-col :span="8" v-for="(row, index) of videoList" :key="index">
+            <div
+              :title="`${row.title} ${row.local}`"
+              class="wallpaper-item"
+              @click="selWallpaper(row, 2)"
+              :class="{ active: activeSrc == row.src }"
+            >
+              <video :alt="row.title" :src="row.src" />
+            </div>
+          </el-col>
+        </el-row>
       </li>
     </ul>
   </section>

@@ -13,40 +13,10 @@ const videoList = [
   },
 ]
 const imgList = [{
-  title: "Loughrigg Tarn的日出",
-  local: "欧洲 英国 英格兰湖区安布尔塞德",
-  src: "https://tvax1.sinaimg.cn/large/007Tv3Vmly1gd0yldnd9ej31hc0u047i.jpg",
-}, {
-  title: "黑暗中为你照明",
-  local: "欧洲 波兰 希维诺乌伊希切",
-  src: "https://tvax1.sinaimg.cn/large/bfe05ea9ly1fxgv3f6vjyj21hc0u07df.jpg",
-},
-{
-  title: "残阳夕照 落日余晖",
-  local: "亚洲 越南 下龙湾",
-  src: "https://tvax1.sinaimg.cn/large/bfe05ea9ly1fxgumr0a7mj21hc0u0k0j.jpg",
-},
-
-{
-  title: "",
-  local: "",
-  src: "https://wallpaper.infinitynewtab.com/wallpaper/3036.jpg",
-},
-{
-  title: "圣托里尼岛鸟瞰图",
-  local: "欧洲 希腊",
-  src: "https://tvax1.sinaimg.cn/large/007Tv3Vmly1gdlv1ubltej31hc0u0n67.jpg",
-},
-{
-  title: "南奥索峰的Lac d'Ayous小屋",
-  local: "欧洲 法国",
-  src: "https://tvax1.sinaimg.cn/large/007Tv3Vmly1getlalfp0hj31hc0u0dov.jpg",
-},
-{
-  title: "克林格尔农场的Mazezilla玉米田迷宫",
-  local: "宾夕法尼亚州",
-  src: "https://cn.bing.com//th?id=OHR.Mazezilla_ZH-CN8502282112_1920x1080.jpg&rf=LaDigue_1920x1080.jpg",
-},
+  title: "默认",
+  local: "中国",
+  src: "https://estart.s3.bitiful.net/20250610di114c.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=4kzkvzGHpepkHti1yLbU4waG%2F20260110%2F%2Fs3%2Faws4_request&X-Amz-Date=20260110T090538Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&no-wait=on&x-id=GetObject&X-Amz-Signature=0fcea357aace0d8e83577e93eedf9e60cb790cc2ef53eb0c3f52d9e5b51523ac",
+}, 
 ]
 
 

@@ -178,6 +178,13 @@ export default new Vuex.Store({
     },
     // 初始化
     async initSetting(context) {
+      // 获取必应壁纸
+      api.getBingWallpaper().then(res => {
+        if (res.code === 200) {
+          context.commit('setBingWallpaper', res.data)
+        }
+      })
+
       // if (IsPC()) {
       //   setContent.iconSize = 70
       //   setContent.layout = [2, 5]

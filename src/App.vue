@@ -65,8 +65,8 @@ export default {
   },
   computed: {
     wallpaper() {
-      let wallpaper = this.videoList[0];
-      wallpaper.type = 2;
+      let wallpaper = this.imgList[0];
+      wallpaper.type = 0;
       return this.$store.state.wallpaper || wallpaper;
     },
     themeMode() {

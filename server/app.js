@@ -310,6 +310,32 @@ app.get('/api/baidu_sugrec/:word', async (req, res) => {
     }
 });
 
+// 必应每日壁纸
+app.get('/api/bing', async (req, res) => {
+    try {
+        const bingRes = await axios.get('https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1');
+        const data = bingRes.data;
+        if (data && data.images && data.images.length > 0) {
+            const image = data.images[0];
+            const baseUrl = 'https://cn.bing.com';
+            res.json({
+                code: 200,
+                data: {
+                    title: image.title,
+                    copyright: image.copyright,
+                    src: baseUrl + image.url,
+                    fullSrc: baseUrl + image.urlbase + '_1920x1080.jpg&rf=LaDigue_1920x1080.jpg' // Approximate logic
+                }
+            });
+        } else {
+             response(res, 500, '获取必应壁纸失败');
+        }
+    } catch (error) {
+        log('error', 'Bing wallpaper proxy error', { error: error.message });
+        res.status(500).json({ code: 500, msg: error.message });
+    }
+});
+
 // 7. 豆瓣 FM (Mock)
 app.get('/api/fm/playlist', (req, res) => {
     // 返回一些假数据

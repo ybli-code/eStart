@@ -92,6 +92,11 @@ export default {
     return axios.get(`${dreamwqApi}/api/yiyan`);
   },
 
+  //获取必应壁纸
+  getBingWallpaper() {
+    return axios.get(`${dreamwqApi}/api/bing`);
+  },
+
   //百度搜索
   baiduSugrec(params) {
     return axios.get(`${dreamwqApi}/api/baidu_sugrec/${params}`);
