@@ -25,9 +25,33 @@ cleanup() {
 }
 trap cleanup SIGINT SIGTERM EXIT
 
+# 0. 检查端口占用并清理
+check_and_kill_port() {
+    local port=$1
+    echo "检查端口 $port 占用..."
+    
+    # 获取占用端口的 PID (兼容 Linux/macOS)
+    # lsof -t -i:8081
+    local pids=$(lsof -t -i:$port 2>/dev/null)
+    
+    if [ -n "$pids" ]; then
+        echo "⚠️  发现端口 $port 被进程占用 (PID: $pids)，正在强制关闭..."
+        kill -9 $pids
+        echo "✅  已释放端口 $port"
+    else
+        echo "端口 $port 空闲。"
+    fi
+}
+
 echo "======================================"
 echo "   启动 estart 服务 ($ENV_MODE)"
 echo "======================================"
+
+# 清理端口 8081 (后端) 和 8088 (前端)
+check_and_kill_port 8081
+if [ "$ENV_MODE" = "development" ]; then
+    check_and_kill_port 8088
+fi
 
 # 1. 准备后端环境
 echo "[Step 1] 检查后端依赖..."
@@ -61,6 +85,16 @@ else
     # === 生产模式 (默认) ===
     echo "[Production] 启动模式: 正式部署 (Node.js 托管静态资源)"
     
+    # 强制重新构建 (防止配置修改未生效)
+    # 如果存在 search 目录但用户想强制更新，可以手动删除 search 目录，或者我们通过检查 .env 变更(较复杂)。
+    # 这里为了稳妥，我们增加一个提示，并尝试自动清理旧的构建（如果是在 CI/CD 流程中通常是干净环境，但手动部署容易有缓存）
+    
+    if [ -d "search" ]; then
+        echo "⚠️  检测到已存在构建产物 (search 目录)。"
+        echo "⚠️  如果修改了配置(.env)，请务必删除 search 目录以触发重新构建: 'rm -rf search'"
+        # 简单策略: 这里我们不自动删，避免意外，但给出强提示。
+    fi
+
     # 检查是否已构建
     if [ ! -d "search" ]; then
         echo "未检测到构建产物 (search 目录)，正在构建前端..."
@@ -79,15 +113,6 @@ else
     # 也可以用 pm2 启动: pm2 start app.js --name "lingo-server"
     node app.js
 fi
-    
-    # 检查是否已构建
-    if [ ! -d "search" ]; then
-        echo "未检测到构建产物 (search 目录)，正在构建前端..."
-        if [ ! -d "node_modules" ]; then
-            yarn install
-        fi
-        # 使用 build:web 脚本，因为 outputDir 依赖 NODE_ENV=web
-        npm run build:web
     else
         echo "检测到现有构建产物，跳过构建。(如需重构请删除 search 目录)"
     fi
