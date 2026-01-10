@@ -55,31 +55,86 @@ cd ..
 
 ### 2. Start Services
 
-You can use the provided script to start all services, or start them manually.
+You can use the provided script to start services with one click, automatically distinguishing between development and production environments.
 
-**Option A: Using Script (Recommended)**
-
-```bash
-# Windows (Git Bash / WSL) or Linux/macOS
-./start.sh
-```
-
-**Option B: Manual Start**
+**Development Mode (Local)**
+Supports Hot Reload and separate frontend service.
 
 ```bash
-# Terminal 1: Start Backend
-cd server
-node app.js
-# Backend running at: http://localhost:8081
-
-# Terminal 2: Start Frontend
-yarn serve
-# Frontend running at: http://localhost:8088
+bash start.sh development
+# or
+bash start.sh dev
 ```
 
-Open your browser: `http://localhost:8088`
+**Production Mode (Server Deployment)**
+Automatically builds frontend, uses Node.js to serve static resources and API for better performance.
 
-## 📦 Deployment
+```bash
+bash start.sh production
+# or
+bash start.sh prod
+```
+
+## 📦 Deployment Guide (Server)
+
+### Option A: Using Caddy (Recommended - Most Elegant)
+
+We recommend using [Caddy](https://caddyserver.com/) as the gateway server. It automatically manages HTTPS certificates and the configuration is extremely simple.
+
+1. **Install Caddy**: [https://caddyserver.com/docs/install](https://caddyserver.com/docs/install)
+2. **Modify Configuration**: Edit `Caddyfile` in the root directory.
+
+   `Caddyfile` Example:
+   ```caddyfile
+   # Scenario 1: IP Access only (No domain)
+   :80 {
+       reverse_proxy localhost:8081
+   }
+
+   # Scenario 2: With Domain (Auto SSL)
+   # Replace example.com with your domain
+   # example.com {
+   #     reverse_proxy localhost:8081
+   #     encode gzip
+   # }
+   ```
+
+3. **Start Node Service**:
+   ```bash
+   # Start Node.js app in background
+   bash start.sh prod
+   # OR use PM2 (Recommended)
+   cd server && pm2 start app.js --name "estart-server"
+   ```
+
+4. **Start Caddy**:
+   ```bash
+   # Run in root directory
+   caddy run
+   # OR start as daemon
+   caddy start
+   ```
+
+   **💡 Why only proxy 8081?**
+   You don't need to proxy frontend files separately. In production mode, our Node.js backend (`server/app.js`) acts as a **Full Stack Server**: it handles API requests AND automatically serves built frontend static assets (`../search` directory). This "Monolithic" deployment is simple and elegant, avoiding complex CORS and path issues.
+
+### Option B: Using Nginx
+
+If you already use Nginx, you can configure a reverse proxy:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+## 🛠 CI/CD Automation
 
 This project supports CI/CD automated deployment via **Gitee Go**.
 

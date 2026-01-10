@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_ENV=web vue-cli-service serve",
     "dev:web": "cross-env NODE_ENV=web vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:web": "cross-env NODE_ENV=web vue-cli-service",
+    "build:web": "cross-env NODE_ENV=web vue-cli-service build",
     "b": "vue-cli-service build && cross-env NODE_ENV=web vue-cli-service build"
   },
   "dependencies": {

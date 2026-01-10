@@ -355,6 +355,26 @@ app.get('/website/list', (req, res) => {
 });
 
 
+// === 静态资源托管 (生产环境) ===
+// 假设前端构建输出在 ../search 目录（根据 vue.config.js outputDir: 'search'）
+const staticPath = path.join(__dirname, '../search');
+if (fs.existsSync(staticPath)) {
+    log('info', `Hosting static files from ${staticPath}`);
+    app.use(express.static(staticPath));
+
+    // 处理 SPA 路由：所有未匹配的 API 请求都返回 index.html
+    // 注意：要放在所有 API 路由之后
+    app.get('*', (req, res) => {
+        // 如果是 API 请求，不返回 index.html (通常 404)
+        if (req.path.startsWith('/api') || req.path.startsWith('/index') || req.path.startsWith('/configInfo') || req.path.startsWith('/website')) {
+             return res.status(404).json({ code: 404, msg: 'Not Found' });
+        }
+        res.sendFile(path.join(staticPath, 'index.html'));
+    });
+} else {
+    log('warn', `Static directory not found: ${staticPath}. Run 'npm run build' in root directory first.`);
+}
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
