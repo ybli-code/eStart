@@ -42,8 +42,8 @@ axios.interceptors.response.use(response => {
 
 // let baseUrl = 'http://localhost:8081' //振兴
 // let dreamwqApi = 'http://localhost:8081' //api
-let dreamwqApi = '/apis' //api
-let baseUrl = '/apis'
+let dreamwqApi = process.env.VUE_APP_BASE_API //api
+let baseUrl = process.env.VUE_APP_BASE_API
 
 export default {
   // 登陆

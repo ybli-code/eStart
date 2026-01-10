@@ -7,16 +7,6 @@ cleanup() {
     pkill -P $$
     exit
 }
-# 2. 启动前端
-echo "[2/2] 启动前端服务 (Port: 8088)..."
-# 检查 node_modules
-if [ ! -d "node_modules" ]; then
-    echo "发现前端依赖未安装，正在安装..."
-    yarn install --ignore-engines
-fi
-
-# 启动前端 (这将占用当前终端)
-yarn serve
 
 
 # 捕获退出信号
