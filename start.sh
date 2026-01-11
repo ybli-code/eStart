@@ -20,7 +20,13 @@ fi
 # 定义清理函数
 cleanup() {
     echo "正在停止服务..."
-    pkill -P $$
+    if command -v pkill >/dev/null 2>&1; then
+        pkill -P $$
+    else
+        # Fallback for environments without pkill (e.g. Git Bash on Windows)
+        # Kill all background jobs started by this shell
+        kill $(jobs -p) 2>/dev/null
+    fi
     exit
 }
 trap cleanup SIGINT SIGTERM EXIT
@@ -34,9 +40,25 @@ check_and_kill_port() {
     # lsof -t -i:8081
     local pids=$(lsof -t -i:$port 2>/dev/null)
     
+    # Windows (Git Bash) fallback if lsof is missing or returns nothing
+    if [ -z "$pids" ]; then
+        if uname -s | grep -qE "MINGW|MSYS|CYGWIN|Windows_NT"; then
+             # Find PID using netstat. Output format: Proto Local Address Foreign Address State PID
+             # Filter for listening ports or established connections on the specific port
+             pids=$(netstat -aon | grep ":$port " | awk '{print $NF}' | sort -u | grep -v "0")
+        fi
+    fi
+    
     if [ -n "$pids" ]; then
         echo "⚠️  发现端口 $port 被进程占用 (PID: $pids)，正在强制关闭..."
-        kill -9 $pids
+        # On Windows, kill -9 might work if it's a cygwin PID, but taskkill is safer for Windows PIDs
+        if uname -s | grep -qE "MINGW|MSYS|CYGWIN|Windows_NT"; then
+            for pid in $pids; do
+                taskkill //F //PID $pid >/dev/null 2>&1 || kill -9 $pid >/dev/null 2>&1
+            done
+        else
+            kill -9 $pids
+        fi
         echo "✅  已释放端口 $port"
     else
         echo "端口 $port 空闲。"

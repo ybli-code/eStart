@@ -10,8 +10,9 @@ const app = express();
 const PORT = 8081;
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// 增加 limit 配置，允许最大 50MB 的 JSON 数据
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // ------ 日志配置 ------
 
