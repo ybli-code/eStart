@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 # ai prompt
 /prompt
+server/db.json
