@@ -32,6 +32,15 @@ stages:
         notify: []
         strategy:
           retry: '0'
+      - step: publish@general_artifacts
+        name: publish_general_artifacts
+        displayName: 上传制品
+        dependArtifact: BUILD_ARTIFACT
+        artifactName: search
+        notify: []
+        strategy:
+          retry: '0'
+        dependsOn: build_nodejs
       - step: deploy@agent
         name: deploy_agent
         displayName: 主机部署
@@ -55,4 +64,4 @@ stages:
         notify: []
         strategy:
           retry: '0'
-        dependsOn: build_nodejs
+        dependsOn: publish_general_artifacts
