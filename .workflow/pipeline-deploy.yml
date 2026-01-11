@@ -21,16 +21,14 @@ stages:
         commands:
           - '# 设置NPM源，提升安装速度'
           - npm config set registry https://registry.npmmirror.com
-          - ''
+          - npm install && npm run build:web
           - '# 执行编译命令'
           - echo "复制项目"
         artifacts:
           - name: BUILD_ARTIFACT
             path:
               - ./search
-        caches:
-          - ~/.npm
-          - ~/.yarn
+        caches: []
         notify: []
         strategy:
           retry: '0'
