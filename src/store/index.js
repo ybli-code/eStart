@@ -86,6 +86,8 @@ const setContent = {
   yiyan: true, //是否显示一言
   showWeather: true, //是否显示左上角天气
   search: 'baidu', //默认搜索
+  timeSize: 50, //时间字体大小
+  timeBold: false, //时间是否加粗
 }
 export default new Vuex.Store({
   state: {
@@ -95,6 +97,7 @@ export default new Vuex.Store({
     bingWallpaper: {}, //壁纸
     navList: [], //导航图标列表
     // 无需存储local
+    hideAppGroup: false, //是否隐藏应用列表
     editType: '', //编辑类型  add edit
     moment: '', //天气时刻  d白天 n晚上 
     note: [],
@@ -161,6 +164,9 @@ export default new Vuex.Store({
     },
     setNavRowData(state, val) {
       state.navRowData = val
+    },
+    setHideAppGroup(state, val) {
+      state.hideAppGroup = val
     },
     setLoginInfo(state, val) {
       state.loginInfo = val
@@ -237,7 +243,7 @@ export default new Vuex.Store({
       Object.keys(setContent).forEach(key => {
         if (state.setContent[key] == undefined) {
           // 如果local里没有 当前项  那么设置成默认
-          state.setContent[key] = setContent[key]
+          Vue.set(state.setContent, key, setContent[key])
         }
       })
     }

@@ -21,6 +21,24 @@
         显示左上角天气
         <el-switch v-model="showWeather"></el-switch>
       </li>
+      <li class="d-flex-between">
+        时间加粗
+        <el-switch v-model="timeBold"></el-switch>
+      </li>
+      <li>
+        时间大小
+        <div class="d-flex-between">
+          <el-slider
+            :min="20"
+            :max="100"
+            v-model="timeSize"
+            class="wfull"
+          ></el-slider>
+          <span class="range-slider__value">
+            <span>{{ timeSize }}px</span>
+          </span>
+        </div>
+      </li>
 
       <li>
         图标大小
@@ -141,6 +159,17 @@ export default {
   mounted() {},
   //方法集合
   methods: {
+    // 节流函数
+    throttle(fn, delay) {
+      let last = 0;
+      return function (...args) {
+        const now = Date.now();
+        if (now - last > delay) {
+          fn.apply(this, args);
+          last = now;
+        }
+      };
+    },
     setLayout(row) {
       let setContent = this.$store.state.setContent || {};
       setContent.layout = row;
@@ -156,7 +185,7 @@ export default {
         return this.$store.state.setContent.yiyan;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.yiyan = val;
         this.$store.commit("setSetContent", setContent);
       },
@@ -166,7 +195,7 @@ export default {
         return this.$store.state.setContent.iconRadius;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.iconRadius = val;
         this.$store.commit("setSetContent", setContent);
       },
@@ -177,7 +206,7 @@ export default {
         return this.$store.state.setContent.iconOpacity;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.iconOpacity = val;
         this.$store.commit("setSetContent", setContent);
       },
@@ -188,7 +217,7 @@ export default {
         return this.$store.state.setContent.iconSize;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.iconSize = val;
         this.$store.commit("setSetContent", setContent);
       },
@@ -199,7 +228,7 @@ export default {
         return this.$store.state.setContent.iconTitle;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.iconTitle = val;
         this.$store.commit("setSetContent", setContent);
       },
@@ -210,19 +239,8 @@ export default {
         return this.$store.state.setContent.startAnimation;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.startAnimation = val;
-        this.$store.commit("setSetContent", setContent);
-      },
-    },
-    // 一言
-    yiyan: {
-      get() {
-        return this.$store.state.setContent.yiyan;
-      },
-      set(val) {
-        let setContent = this.$store.state.setContent || {};
-        setContent.yiyan = val;
         this.$store.commit("setSetContent", setContent);
       },
     },
@@ -232,8 +250,35 @@ export default {
         return this.$store.state.setContent.showWeather;
       },
       set(val) {
-        let setContent = this.$store.state.setContent || {};
+        let setContent = { ...this.$store.state.setContent };
         setContent.showWeather = val;
+        this.$store.commit("setSetContent", setContent);
+      },
+    },
+    // 时间大小
+    timeSize: {
+      get() {
+        return this.$store.state.setContent.timeSize;
+      },
+      set: function (val) {
+        if (!this._throttledTimeSize) {
+          this._throttledTimeSize = this.throttle((v) => {
+            let setContent = { ...this.$store.state.setContent };
+            setContent.timeSize = v;
+            this.$store.commit("setSetContent", setContent);
+          }, 100);
+        }
+        this._throttledTimeSize(val);
+      },
+    },
+    // 时间加粗
+    timeBold: {
+      get() {
+        return this.$store.state.setContent.timeBold;
+      },
+      set(val) {
+        let setContent = { ...this.$store.state.setContent };
+        setContent.timeBold = val;
         this.$store.commit("setSetContent", setContent);
       },
     },
@@ -242,6 +287,51 @@ export default {
 };
 </script>
 <style lang='less' scoped>
+/* 滑块视觉反馈优化 */
+/deep/ .el-slider__runway {
+  background-color: rgba(var(--main-color), 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/deep/ .el-slider__bar {
+  transition: background-color 0.3s;
+}
+
+/deep/ .el-slider__button {
+  border: 2px solid var(--primary-color);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover, &:active {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px var(--primary-color);
+  }
+}
+
+/* 边界弹性效果 */
+/deep/ .el-slider__button-wrapper {
+  transition: transform 0.1s ease-out;
+}
+
+/* 实时数值微动画 */
+.range-slider__value {
+  display: inline-block;
+  min-width: 45px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.1s ease;
+  
+  span {
+    display: inline-block;
+    animation: value-pop 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes value-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 .layout-content {
   transition: border 0.2s;
   display: flex;

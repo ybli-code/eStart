@@ -7,8 +7,14 @@
 */
 <template>
   <div class="app-date-box ac">
-    <p class="app-time">{{ time }}</p>
-    <p class="app-date">{{ date }} 星期{{ week }}</p>
+    <div @click="toggleAppGroup" class="pointer time-container d-flex-column">
+      <div class="time-wrapper d-flex-center">
+        <span class="time-unit" :style="timeStyle">{{ timeHour }}</span>
+        <span class="time-separator" :style="timeStyle">:</span>
+        <span class="time-unit" :style="timeStyle">{{ timeMinute }}</span>
+      </div>
+      <p class="app-date" :style="dateStyle">{{ date }} 星期{{ week }}</p>
+    </div>
   </div>
 </template>
 
@@ -21,7 +27,8 @@ export default {
   data() {
     //这里存放数据
     return {
-      time: "",
+      timeHour: "",
+      timeMinute: "",
       date: "",
       week: "",
       timer: null, //定时器
@@ -34,10 +41,32 @@ export default {
     // 初始化获取天气
     this.getTimeing();
   },
-  computed: {},
+  computed: {
+    setContent() {
+      return this.$store.state.setContent || {};
+    },
+    timeStyle() {
+      return {
+        fontSize: (this.setContent.timeSize || 50) + "px",
+        fontWeight: this.setContent.timeBold ? "bold" : "normal",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      };
+    },
+    dateStyle() {
+      return {
+        fontSize: Math.max(12, (this.setContent.timeSize || 50) * 0.24) + "px",
+        fontWeight: this.setContent.timeBold ? "bold" : "normal",
+        marginTop: Math.max(4, (this.setContent.timeSize || 50) * 0.1) + "px",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      };
+    },
+  },
   watch: {},
   //方法集合
   methods: {
+    toggleAppGroup() {
+      this.$store.commit("setHideAppGroup", !this.$store.state.hideAppGroup);
+    },
     // 定时获取时间
     getTimeing() {
       // 即时获取时间
@@ -60,7 +89,8 @@ export default {
         7: "日",
       };
       this.date = dayjs().format("MM月DD日");
-      this.time = dayjs().format("HH:mm");
+      this.timeHour = dayjs().format("HH");
+      this.timeMinute = dayjs().format("mm");
       this.week = week[dayjs().day()];
     },
     // 判断白天晚上
@@ -91,20 +121,35 @@ export default {
   },
 };
 </script>
-<style lang='less' scoped>
-//@import url();
+<style lang="less" scoped>
 .app-date-box {
   color: #fff;
   margin-bottom: 20px;
-  .app-time {
-    color: #fff;
-    line-height: 50px;
-    font-size: 50px;
-  }
-  .app-date {
-    font-size: 12px;
-    line-height: 26px;
-    color: rgba(255, 255, 255, 0.8);
-  }
+}
+.time-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.time-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 0.1em; /* 使用 em 单位随字体大小自动调整间距 */
+  min-width: 2em;
+}
+.time-unit {
+  display: inline-block;
+  min-width: 1.2em; /* 确保时/分有最小显示间距，防止跳动 */
+  text-align: center;
+}
+.time-separator {
+  display: inline-block;
+  margin: 0 0.05em;
+}
+.app-date {
+  opacity: 0.8;
+  white-space: nowrap;
 }
 </style>

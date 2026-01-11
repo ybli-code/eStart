@@ -17,11 +17,15 @@
       <!-- 搜索框功能 -->
       <searchBox />
       <!-- 应用列表 -->
-      <appGroupNav class="d-cell" />
+      <transition name="app-group-fade">
+        <appGroupNav class="d-cell" v-show="!hideAppGroup" />
+      </transition>
 
       <!-- FM -->
       <!-- <fm /> -->
-      <yiyan class="d-cell" v-if="yiyan" />
+      <div class="yiyan-container d-cell">
+        <yiyan v-if="yiyan" />
+      </div>
     </div>
     <!-- 便笺贴 -->
     <pinned />
@@ -71,6 +75,9 @@ export default {
     yiyan() {
       return this.$store.state.setContent.yiyan;
     },
+    hideAppGroup() {
+      return this.$store.state.hideAppGroup;
+    },
   },
   watch: {},
   //方法集合
@@ -102,5 +109,28 @@ export default {
   width: 180px;
   color: #fff;
   display: inline-block;
+}
+
+/* 应用列表显隐动画 */
+.app-group-fade-enter-active,
+.app-group-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center top;
+}
+
+.app-group-fade-enter,
+.app-group-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.98);
+}
+
+/* 固定一言位置 */
+.yiyan-container {
+  margin-top: auto; /* 推到最底部 */
+  padding-bottom: 20px;
+  min-height: 60px; /* 保持固定高度，防止显隐时抖动 */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 </style>
