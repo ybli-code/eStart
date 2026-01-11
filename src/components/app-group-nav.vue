@@ -15,7 +15,7 @@
       <el-carousel
         ref="elCarousel"
         arrow="never"
-        :height="`${(setContent.iconSize + 60) * layout[0]}px`"
+        :height="`${(adaptiveIconSize + 60) * layout[0]}px`"
         :autoplay="false"
         :initial-index="initialIndex"
         indicator-position="outside"
@@ -37,7 +37,7 @@
               @touchstart="gotouchstart()"
               @touchmove="gotouchmove()"
               @touchend="gotouchend()"
-              v-size="setContent.iconSize"
+              v-size="adaptiveIconSize"
               :title="item.title"
             >
               <!-- 图标操作 -->
@@ -85,7 +85,7 @@
               <div
                 @click.stop="urlTo(item)"
                 v-else
-                v-font="setContent.iconSize"
+                v-font="adaptiveIconSize"
                 :style="[
                   {
                     backgroundColor: `${
@@ -142,6 +142,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      windowWidth: window.innerWidth,
       myArray: [],
       initialIndex: 0,
       isEdit: false,
@@ -154,6 +155,7 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    window.addEventListener("resize", this.handleResize);
     document.addEventListener(
       "click",
       () => {
@@ -164,6 +166,9 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
+  destroyed() {
+    window.removeEventListener("resize", this.handleResize);
+  },
   computed: {
     // 获取所有菜单并分组
     navList() {
@@ -185,6 +190,21 @@ export default {
     setContent() {
       return this.$store.state.setContent || {};
     },
+    // 计算适配后的图标大小
+    adaptiveIconSize() {
+      const baseSize = this.setContent.iconSize || 60;
+      // 如果不是手机端（假设768px以上），直接返回原大小
+      if (this.windowWidth > 768) return baseSize;
+
+      // 手机端自动缩小逻辑
+      const screenWidth = this.windowWidth;
+      const columns = screenWidth <= 480 ? 3 : 4; // 对应 CSS 中的媒体查询
+      const padding = 40; // 左右内边距总和
+      const availableWidth = screenWidth - padding;
+      const maxIconSize = Math.floor(availableWidth / columns) - 20; // 留出间距
+
+      return Math.min(baseSize, maxIconSize);
+    },
     // 布局设置
     layout() {
       return this.$store.state.setContent.layout || [2, 8];
@@ -197,6 +217,9 @@ export default {
   watch: {},
   //方法集合
   methods: {
+    handleResize() {
+      this.windowWidth = window.innerWidth;
+    },
     ondrop() {
       console.log(11);
     },
