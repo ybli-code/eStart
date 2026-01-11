@@ -43,51 +43,53 @@
         </div>
         <h3>必应</h3>
         <el-row :gutter="10">
-          <el-col :span="8">
+          <el-col :span="8" v-for="(item, index) in displayList" :key="index">
             <div
-              :title="`${bingWallpaper.title} ${bingWallpaper.copyright}`"
+              :title="`${item.title} ${item.copyright}`"
               class="wallpaper-item"
-              @click="selWallpaper(bingWallpaper, 1)"
-              :class="{ active: activeSrc == bingWallpaper.fullSrc }"
+              @click="selWallpaper(item, 1)"
+              :class="{ active: activeSrc == item.src }"
             >
               <el-image
                 fit="cover"
                 class="wallpaper-img"
-                :alt="bingWallpaper.title"
-                :src="bingWallpaper.src"
+                :alt="item.title"
+                :src="item.src"
                 lazy
               ></el-image>
             </div>
           </el-col>
-          <el-col :span="16">
-            <title>必应壁纸</title>
-            <p
-              class="f12 bing-copyright"
-              :title="bingWallpaper.copyright"
-              style="line-height: 18px"
-            >
-              {{ bingWallpaper.copyright }}
-            </p>
-            <p class="f12">
-              图像来源:
-              <a
-                v-color="'var(--primary-color)'"
-                href="https://cn.bing.com/"
-                target="_blank"
-                >必应</a
-              >
-
-              <a
-                v-color="'var(--primary-color)'"
-                class="ml10"
-                href="/"
-                download="bing"
-                target="_blank"
-                >点此下载</a
-              >
-            </p>
-          </el-col>
         </el-row>
+        
+        <div style="text-align: center; margin: 10px 0;">
+          <el-button 
+            v-if="!isExpanded && (bingList.length > 3 || randomList.length > 0)" 
+            type="text" 
+            @click="toggleExpand"
+            size="small">
+            展开更多 <i class="el-icon-arrow-down"></i>
+          </el-button>
+          
+          <div v-if="isExpanded">
+             <el-button 
+               :loading="isLoading"
+               type="primary" 
+               plain
+               size="mini" 
+               round
+               @click="loadMoreRandom">
+               加载更多随机壁纸
+             </el-button>
+             <el-button 
+               type="text" 
+               class="ml10"
+               size="small" 
+               @click="toggleExpand">
+               收起 <i class="el-icon-arrow-up"></i>
+             </el-button>
+          </div>
+        </div>
+
         <h3>动态</h3>
         <el-row :gutter="10">
           <el-col :span="8" v-for="(row, index) of videoList" :key="index">
@@ -125,17 +127,26 @@ export default {
       imgList: imgList,
       videoList: videoList,
       activeSrc: "",
+      bingList: [],
+      randomList: [],
+      isExpanded: false,
+      isLoading: false
     };
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.activeSrc = this.$local.get("wallpaper").src;
+    this.getBingList();
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   computed: {
-    bingWallpaper() {
-      return this.$store.state.bingWallpaper || {};
+    displayList() {
+      if (!this.isExpanded) {
+        // 默认显示前3个
+        return this.bingList.slice(0, 3);
+      }
+      return [...this.bingList, ...this.randomList];
     },
     bgBlur: {
       get() {
@@ -151,12 +162,35 @@ export default {
   watch: {},
   //方法集合
   methods: {
+    // 获取必应壁纸列表
+    getBingList() {
+      this.$http.getBingWallpaperList().then(res => {
+        if (res.code === 200) {
+          this.bingList = res.data;
+        }
+      });
+    },
     // 0 本地 1 bing 2视频
     selWallpaper(row, type) {
       row.type = type;
       this.activeSrc = row.src;
       this.$store.commit("setWallpaper", row);
     },
+    toggleExpand() {
+      this.isExpanded = !this.isExpanded;
+    },
+    loadMoreRandom() {
+      this.isLoading = true;
+      this.$http.getBingRandomWallpaper().then(res => {
+        this.isLoading = false;
+        if (res.code === 200) {
+          this.randomList.push(...res.data);
+        }
+      }).catch(() => {
+        this.isLoading = false;
+        this.$message.error('加载壁纸失败，请稍后再试');
+      });
+    }
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前

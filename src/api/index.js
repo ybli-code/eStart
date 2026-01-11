@@ -97,6 +97,16 @@ export default {
     return axios.get(`${dreamwqApi}/api/bing`);
   },
 
+  //获取必应壁纸列表
+  getBingWallpaperList() {
+    return axios.get(`${dreamwqApi}/api/bing/list`);
+  },
+
+  //获取随机壁纸
+  getBingRandomWallpaper() {
+    return axios.get(`${dreamwqApi}/api/bing/random`);
+  },
+
   //百度搜索
   baiduSugrec(params) {
     return axios.get(`${dreamwqApi}/api/baidu_sugrec/${params}`);
