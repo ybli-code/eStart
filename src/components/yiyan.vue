@@ -83,6 +83,7 @@ export default {
   }
   &:hover {
     background-color: rgba(0, 0, 0, 0.02);
+    -webkit-backdrop-filter: blur(1px);
     backdrop-filter: blur(1px);
     .yiyan-from {
       opacity: 1;

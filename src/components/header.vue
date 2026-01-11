@@ -124,6 +124,9 @@ export default {
   min-height: 50px;
   padding: 20px 50px;
   color: #fff;
+  @media screen and (max-width: 768px) {
+    padding: 10px 20px;
+  }
   .header-webther {
     .super {
       // vertical-align: super;

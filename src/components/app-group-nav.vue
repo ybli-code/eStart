@@ -315,7 +315,8 @@ export default {
 }
 .app-group {
   margin-top: 30px;
-  width: 1300px;
+  width: 100%;
+  max-width: 1300px;
   padding: 0 20px;
   overflow: hidden;
   &-item {
@@ -323,6 +324,12 @@ export default {
     text-align: center;
     cursor: pointer;
     width: calc(100% / 5);
+    @media screen and (max-width: 768px) {
+      width: calc(100% / 4);
+    }
+    @media screen and (max-width: 480px) {
+      width: calc(100% / 3);
+    }
     display: inline-block;
     margin-top: 30px;
     .group-item-title {
@@ -340,6 +347,7 @@ export default {
         box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.1);
         height: 100%;
         overflow: hidden;
+        -webkit-backdrop-filter: blur(3px);
         backdrop-filter: blur(3px);
         &:hover {
           box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.4);
