@@ -1,6 +1,7 @@
 <template>
   <div class="app-header">
     <div
+      v-if="$store.state.setContent.showWeather"
       @click="$store.commit('setShowSide', { val: true, comp: 'weather' })"
       class="header-webther fl d-flex-ver d-pointer"
     >

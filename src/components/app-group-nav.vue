@@ -73,7 +73,7 @@
               >
                 <!-- 图标 -->
                 <d-icon
-                  v-size="'40%'"
+                  v-size="'100%'"
                   :icon="`icon-${$weatherIcon[weatherData.now.cond_code]}`"
                 />
                 <p class="group-weather-info">
@@ -117,7 +117,7 @@
                 <!-- icon图标 -->
                 <d-icon
                   v-else
-                  v-size="'42%'"
+                  v-size="'100%'"
                   v-color="item.color"
                   :icon="`icon-${item.key}`"
                 />

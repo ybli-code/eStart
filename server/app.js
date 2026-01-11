@@ -336,6 +336,68 @@ app.get('/api/bing', async (req, res) => {
     }
 });
 
+// 必应壁纸列表
+app.get('/api/bing/list', async (req, res) => {
+    try {
+        const bingRes = await axios.get('https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8');
+        const data = bingRes.data;
+        if (data && data.images && data.images.length > 0) {
+            const baseUrl = 'https://cn.bing.com';
+            const list = data.images.map(image => ({
+                title: image.title,
+                copyright: image.copyright,
+                src: baseUrl + image.url,
+                fullSrc: baseUrl + image.urlbase + '_1920x1080.jpg&rf=LaDigue_1920x1080.jpg',
+                urlbase: image.urlbase,
+                date: image.startdate
+            }));
+            res.json({
+                code: 200,
+                data: list
+            });
+        } else {
+             response(res, 500, '获取必应壁纸列表失败');
+        }
+    } catch (error) {
+        log('error', 'Bing wallpaper list proxy error', { error: error.message });
+        res.status(500).json({ code: 500, msg: error.message });
+    }
+});
+
+// 随机壁纸 (加载更多)
+app.get('/api/bing/random', async (req, res) => {
+    try {
+        const count = 3;
+        const requests = [];
+        for (let i = 0; i < count; i++) {
+            // 添加随机参数防止浏览器/axios缓存
+            requests.push(axios.get(`https://bing.img.run/rand_uhd.php?type=json&t=${Date.now()}${Math.random()}`));
+        }
+        
+        const results = await Promise.all(requests);
+        const list = results.map(r => {
+           if(r.data && r.data.pic) {
+               return {
+                   title: "随机壁纸", // 第三方接口未返回标题
+                   copyright: "来自 Bing 历史图库",
+                   src: r.data.pic,
+                   fullSrc: r.data.pic,
+                   type: 'random'
+               };
+           }
+           return null;
+        }).filter(item => item !== null);
+
+        res.json({
+            code: 200,
+            data: list
+        });
+    } catch (error) {
+        log('error', 'Bing random wallpaper proxy error', { error: error.message });
+        res.status(500).json({ code: 500, msg: error.message });
+    }
+});
+
 // 7. 豆瓣 FM (Mock)
 app.get('/api/fm/playlist', (req, res) => {
     // 返回一些假数据

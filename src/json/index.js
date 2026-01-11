@@ -7,7 +7,7 @@
  */
 const videoList = [
   {
-    title: "格里姆瑟尔山口Totesee山地湖中倒映出的星星",
+    title: "格里姆瑟尔山口湖中倒映出的星星",
     local: "欧洲 瑞士 伯尔尼",
     src: "https://az3.sfo2.cdn.digitaloceanspaces.com/bingdesktop/3455b6778764415593fb5e688218fb89.mp4",
   },
@@ -15,19 +15,13 @@ const videoList = [
 const imgList = [{
   title: "默认",
   local: "中国",
-  src: "https://estart.s3.bitiful.net/20250610di114c.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=4kzkvzGHpepkHti1yLbU4waG%2F20260110%2F%2Fs3%2Faws4_request&X-Amz-Date=20260110T090538Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&no-wait=on&x-id=GetObject&X-Amz-Signature=0fcea357aace0d8e83577e93eedf9e60cb790cc2ef53eb0c3f52d9e5b51523ac",
+  src: "https://cn.bing.com/th?id=OHR.LlamaDay_ZH-CN2646855786_1920x1080.jpg",
 }, 
 ]
 
 
 // 0应用 1内置链接 2自定义链接
-const navList = [{
-  type: 1,
-  url: "",
-  title: "天气",
-  key: "weather",
-  color: "#ffc303"
-},
+const navList = [
 {
   type: 1,
   url: "",

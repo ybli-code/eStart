@@ -144,19 +144,19 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.1);
-    background-image: radial-gradient(
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0.2) 100%
-      ),
-      radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.2) 166%),
-      linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0) 0% 75%,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0.3) 100%
-      );
+    // background-color: rgba(0, 0, 0, 0.1);
+    // background-image: radial-gradient(
+    //     rgba(0, 0, 0, 0) 0%,
+    //     rgba(0, 0, 0, 0.2) 100%
+    //   ),
+    //   radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.2) 166%),
+    //   linear-gradient(
+    //     180deg,
+    //     rgba(0, 0, 0, 0) 0%,
+    //     rgba(0, 0, 0, 0) 0% 75%,
+    //     rgba(0, 0, 0, 0) 0%,
+    //     rgba(0, 0, 0, 0.3) 100%
+    //   );
   }
 }
 .wallpaper-info {
