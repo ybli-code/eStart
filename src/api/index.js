@@ -28,14 +28,9 @@ axios.interceptors.response.use(response => {
   if (res.code == 500) {
     Message.error(res.msg)
   } else if (res.code == 400) {
-    Message.error('登陆已过期,请重新登陆')
+    Message.error('登陆已过期,已切换到离线模式')
     // 清空用户信息
     store.commit('setUserInfo', null)
-    // 调用登陆的弹出框
-    store.commit("setLoginInfo", {
-      visible: true,
-      type: 'login',
-    });
   }
   return response.data
 })

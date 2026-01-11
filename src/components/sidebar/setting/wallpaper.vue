@@ -90,8 +90,8 @@
           </div>
         </div>
 
-        <h3>动态</h3>
-        <el-row :gutter="10">
+        <h3 v-if="videoList && videoList.length > 0">动态</h3>
+        <el-row :gutter="10" v-if="videoList && videoList.length > 0">
           <el-col :span="8" v-for="(row, index) of videoList" :key="index">
             <div
               :title="`${row.title} ${row.local}`"

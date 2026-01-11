@@ -11,7 +11,9 @@
       <h2>账号与备份</h2>
       <ul v-if="Object.keys(userInfo).length">
         <li>
-          <el-button type="text">{{ userInfo.loginName }}</el-button>
+          <el-button type="text">{{
+            userInfo.userInfo ? userInfo.userInfo.account : userInfo.account
+          }}</el-button>
           <el-button class="fr" type="priamry" size="mini" @click="logout"
             >退出登陆</el-button
           >

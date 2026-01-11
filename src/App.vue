@@ -89,6 +89,9 @@ export default {
   },
   //方法集合
   methods: {
+    videoError() {
+      this.$store.commit("setWallpaper", this.imgList[0]);
+    },
     // 禁用右键菜单
     doNothing() {
       window.event.returnValue = false;

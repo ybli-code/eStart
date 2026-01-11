@@ -34,6 +34,7 @@
               type="password"
               v-model="loginForm.password"
               placeholder="请输入密码"
+              @keyup.enter.native="loginOrRegHandle"
             ></el-input>
           </el-form-item>
           <el-form-item
@@ -127,7 +128,7 @@ export default {
           type = "register";
         }
         let params = {};
-        params.loginName = this.loginForm.loginName;
+        params.account = this.loginForm.loginName;
         params.password = encode(this.loginForm.password);
         this.$http[type](params)
           .then((res) => {
