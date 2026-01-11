@@ -60,8 +60,7 @@ stages:
           - tar zxvf ~/gitee_go/deploy/eStart.tar.gz -C /www/wwwroot/e-start/
           - cd /www/wwwroot/e-start
           - git pull
-          - 'rm -rf '
-          - 'bash start.sh '
+          - nohup bash start.sh &
           - echo '部署完成!'
         notify: []
         strategy:
