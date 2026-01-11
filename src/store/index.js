@@ -77,13 +77,14 @@ const setContent = {
   themeMode: 'light', //主题模式
   sunrise: false, //主题样式跟随日出日落
   // 常规设置
-  iconSize: 82, //图标大小
-  iconRadius: 100, //图标半径
-  iconOpacity: 90, //图标透明度
+  iconSize: 80, //图标大小
+  iconRadius: 50, //图标半径
+  iconOpacity: 50, //图标透明度
   iconTitle: true, //图标标题
   startAnimation: true, //启动动画
-  layout: [2, 6], //图标布局
+  layout: [3, 5], //图标布局
   yiyan: true, //是否显示一言
+  showWeather: true, //是否显示左上角天气
   search: 'baidu', //默认搜索
 }
 export default new Vuex.Store({
@@ -193,7 +194,9 @@ export default new Vuex.Store({
       const state = context.state
       state.wallpaper = local.get('wallpaper') || ''
       state.userInfo = userInfo || {}
-      state.setContent = local.get('setContent') || setContent
+      // state.setContent = local.get('setContent') || setContent
+      // 合并本地存储和默认配置
+      state.setContent = Object.assign({}, setContent, local.get('setContent'))
       state.navList = local.get('navList') || utils.deepClone(navList)
       state.bingWallpaper = local.get('bingWallpaper')
       state.note = local.get('note') || [{

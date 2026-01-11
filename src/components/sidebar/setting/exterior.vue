@@ -17,6 +17,10 @@
         显示图标名称
         <el-switch v-model="iconTitle"></el-switch>
       </li>
+      <li class="d-flex-between">
+        显示左上角天气
+        <el-switch v-model="showWeather"></el-switch>
+      </li>
 
       <li>
         图标大小
@@ -208,6 +212,28 @@ export default {
       set(val) {
         let setContent = this.$store.state.setContent || {};
         setContent.startAnimation = val;
+        this.$store.commit("setSetContent", setContent);
+      },
+    },
+    // 一言
+    yiyan: {
+      get() {
+        return this.$store.state.setContent.yiyan;
+      },
+      set(val) {
+        let setContent = this.$store.state.setContent || {};
+        setContent.yiyan = val;
+        this.$store.commit("setSetContent", setContent);
+      },
+    },
+    // 显示左上角天气
+    showWeather: {
+      get() {
+        return this.$store.state.setContent.showWeather;
+      },
+      set(val) {
+        let setContent = this.$store.state.setContent || {};
+        setContent.showWeather = val;
         this.$store.commit("setSetContent", setContent);
       },
     },

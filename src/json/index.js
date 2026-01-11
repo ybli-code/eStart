@@ -21,13 +21,7 @@ const imgList = [{
 
 
 // 0应用 1内置链接 2自定义链接
-const navList = [{
-  type: 1,
-  url: "",
-  title: "天气",
-  key: "weather",
-  color: "#ffc303"
-},
+const navList = [
 {
   type: 1,
   url: "",
