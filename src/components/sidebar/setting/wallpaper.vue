@@ -7,7 +7,18 @@
 */
 <template>
   <section class="set-section">
-    <h2 class="f16">壁纸</h2>
+    <div class="d-flex-between align-center mb10">
+      <h2 class="f16">壁纸</h2>
+      <el-button type="text" size="mini" @click="resetWallpaper" icon="el-icon-refresh">重置默认</el-button>
+    </div>
+    <div v-if="activeSrc" class="wallpaper-status mb10 p10">
+      <span class="f12 d-text-qgray">当前壁纸状态：</span>
+      <el-tag size="mini" type="success">已生效</el-tag>
+    </div>
+    <div v-else class="wallpaper-status mb10 p10">
+      <span class="f12 d-text-qgray">当前壁纸状态：</span>
+      <el-tag size="mini" type="warning">未设置（使用默认）</el-tag>
+    </div>
     <ul>
       <li class>
         对壁纸进行模糊处理
@@ -135,7 +146,8 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.activeSrc = this.$local.get("wallpaper").src;
+    let wallpaper = this.$local.get("wallpaper");
+    this.activeSrc = (wallpaper && wallpaper.src) ? wallpaper.src : '';
     this.getBingList();
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
@@ -175,6 +187,11 @@ export default {
       row.type = type;
       this.activeSrc = row.src;
       this.$store.commit("setWallpaper", row);
+    },
+    resetWallpaper() {
+      const defaultWallpaper = this.imgList[0];
+      this.selWallpaper(defaultWallpaper, 0);
+      this.$message.success('已恢复默认壁纸');
     },
     toggleExpand() {
       this.isExpanded = !this.isExpanded;

@@ -15,7 +15,8 @@ import {
 } from 'element-ui'
 
 import {
-  navList
+  navList,
+  imgList
 } from "@/json";
 import utils from '../utils/utils';
 
@@ -39,13 +40,17 @@ Vue.use(Vuex);
 let saveConfig = (msg) => {
   let userInfo = local.get('userInfo')
   if (!userInfo) return
-  // 走保存接口
-  let params = local.get('setContent')
-  params.note = localStorage.getItem('note')
+  
+  // 从本地获取或从当前内存状态获取
+  let setContentLocal = local.get('setContent') || {}
+  let params = Object.assign({}, setContentLocal)
+  
+  params.note = localStorage.getItem('note') || '[]'
   params.id = localStorage.getItem('configId')
-  params.navlist = localStorage.getItem('navList')
-  params.todo = localStorage.getItem('todo')
-  params.wallpaper = localStorage.getItem('wallpaper')
+  params.navlist = localStorage.getItem('navList') || '[]'
+  params.todo = localStorage.getItem('todo') || '[]'
+  params.wallpaper = localStorage.getItem('wallpaper') || ''
+  
   api.configInfoSave(params).then(res => {
     if (!msg) return
     Message({
@@ -93,7 +98,7 @@ export default new Vuex.Store({
   state: {
     // 需要存储local
     setContent: setContent, //设置内容
-    wallpaper: {}, //壁纸
+    wallpaper: null, //壁纸
     bingWallpaper: {}, //壁纸
     navList: [], //导航图标列表
     // 无需存储local
@@ -198,7 +203,7 @@ export default new Vuex.Store({
       // }
       let userInfo = local.get('userInfo')
       const state = context.state
-      state.wallpaper = local.get('wallpaper') || ''
+      state.wallpaper = local.get('wallpaper') || null
       state.userInfo = userInfo || {}
       // state.setContent = local.get('setContent') || setContent
       // 合并本地存储和默认配置
@@ -219,18 +224,37 @@ export default new Vuex.Store({
         // 如果id==0此账号没有被保存过
         if (data.id == 0) {
           // 走保存接口
-          let params = local.get('setContent')
-          params.note = localStorage.getItem('note')
-          params.navlist = localStorage.getItem('navList')
-          params.todo = localStorage.getItem('todo')
-          params.wallpaper = localStorage.getItem('wallpaper')
-          let res = await api.configInfoSave(params)
+          // 使用当前 state 中的数据，确保新用户能继承默认设置
+          let params = Object.assign({}, state.setContent)
+          params.note = JSON.stringify(state.note)
+          params.navlist = JSON.stringify(state.navList)
+          params.todo = localStorage.getItem('todo') || '[]'
+          // 如果没有壁纸，使用默认壁纸
+          params.wallpaper = localStorage.getItem('wallpaper') || JSON.stringify(imgList[0])
+          
+          let resSave = await api.configInfoSave(params)
+          if (resSave.code == 200) {
+            // 保存成功后可能需要获取新的 configId
+            let resNew = await api.configInfoCurInfo()
+            if (resNew.code == 200 && resNew.data.id != 0) {
+              local.set('configId', resNew.data.id)
+            }
+          }
         } else {
           //保存configID 用于更新配置
           local.set('configId', data.id)
           state.setContent = data || setContent
           state.navList = data.navlist ? JSON.parse(data.navlist) : utils.deepClone(navList)
-          state.wallpaper = data.wallpaper ? JSON.parse(data.wallpaper) : {}
+          
+          // 确保解析出来的 wallpaper 是有效的
+          let wallpaper = {}
+          try {
+            wallpaper = data.wallpaper ? JSON.parse(data.wallpaper) : {}
+          } catch (e) {
+            wallpaper = {}
+          }
+          state.wallpaper = (wallpaper && wallpaper.src) ? wallpaper : null
+          
           state.todo = data.todo ? JSON.parse(data.todo) : {}
           state.note = data.note ? JSON.parse(data.note) : [{
             text: "",

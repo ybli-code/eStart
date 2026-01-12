@@ -67,7 +67,12 @@ export default {
     wallpaper() {
       let wallpaper = this.imgList[0];
       wallpaper.type = 0;
-      return this.$store.state.wallpaper || wallpaper;
+      let storeWallpaper = this.$store.state.wallpaper;
+      // 确保 wallpaper 存在且有有效的 src
+      if (storeWallpaper && storeWallpaper.src) {
+        return storeWallpaper;
+      }
+      return wallpaper;
     },
     themeMode() {
       // 如果设置跟随日出日落
