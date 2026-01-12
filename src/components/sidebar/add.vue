@@ -70,9 +70,13 @@
                 />
                 <d-icon
                   v-else
-                  v-size="'40%'"
-                  v-color="addForm.color"
-                  :icon="`icon-${addForm.key}`"
+                  :style="{
+                    width: addForm.bgColor ? '60%' : '40%',
+                    height: addForm.bgColor ? '60%' : '40%',
+                    fontSize: addForm.bgColor ? '0.6em' : '0.4em'
+                  }"
+                  v-color="addForm.color || (addForm.bgColor ? '#fff' : '')"
+                  :icon="addForm.iconName || `icon-${addForm.key}`"
                 />
               </div>
             </div>

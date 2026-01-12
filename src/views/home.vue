@@ -23,7 +23,7 @@
 
       <!-- FM -->
       <!-- <fm /> -->
-      <div class="yiyan-container">
+      <div class="yiyan-container d-cell">
         <yiyan v-if="yiyan" />
       </div>
     </div>
@@ -98,9 +98,6 @@ export default {
   height: 100%;
   display: flex;
   flex-flow: column;
-  & > *:not(.d-cell) {
-    flex-shrink: 0;
-  }
 }
 .app-container {
   // position: absolute;

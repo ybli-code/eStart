@@ -21,25 +21,30 @@
         indicator-position="outside"
         :class="`layout-col-${layout[0]} layout-row-${layout[1]}`"
       >
-        <el-carousel-item v-for="(groupRow, index) in navList" :key="index">
-          <div
-            class="app-group-item"
-            :class="[{ swing: isEdit }, { scaleOut: item.delete }]"
-            v-for="item of groupRow"
-            :key="item.id"
+        <el-carousel-item v-for="(groupRow, pageIndex) in navList" :key="pageIndex">
+          <draggable
+            :list="groupRow"
+            v-bind="dragOptions"
+            filter=".icon-item-handle"
+            @start="onDragStart"
+            @end="onDragEnd"
+            class="app-group-page"
           >
             <div
-              @dragstart="ondrop"
-              @dragleave="ondragover"
-              draggable="true"
-              class="group-item-content"
-              @contextmenu.prevent="isEdit = true"
-              @touchstart="gotouchstart()"
-              @touchmove="gotouchmove()"
-              @touchend="gotouchend()"
-              v-size="adaptiveIconSize"
-              :title="item.title"
+              class="app-group-item"
+              :class="[{ swing: isEdit }, { scaleOut: item.delete }]"
+              v-for="item of groupRow"
+              :key="item.id"
             >
+              <div
+                class="group-item-content"
+                @contextmenu.prevent="isEdit = true"
+                @touchstart="gotouchstart()"
+                @touchmove="gotouchmove()"
+                @touchend="gotouchend()"
+                v-size="setContent.iconSize"
+                :title="item.title"
+              >
               <!-- 图标操作 -->
               <div class="icon-item-handle" v-if="item.key != 'add'">
                 <p
@@ -85,20 +90,12 @@
               <div
                 @click.stop="urlTo(item)"
                 v-else
-                v-font="adaptiveIconSize"
-                :style="[
-                  {
-                    backgroundColor: `${
-                      item.bgColor
-                        ? item.bgColor
-                        : `rgba(var(--background),${
-                            setContent.iconOpacity / 100
-                          })`
-                    }`,
-                  },
-                  { borderRadius: `${setContent.iconRadius / 2}%` },
-                ]"
                 class="group-item-icon d-flex-center"
+                :style="{
+                  backgroundColor: item.bgColor || `rgba(var(--background),${setContent.iconOpacity / 100})`,
+                  borderRadius: `${setContent.iconRadius / 2}%`,
+                  fontSize: `${adaptiveIconSize}px`
+                }"
               >
                 <!--文字  -->
                 <span
@@ -117,9 +114,13 @@
                 <!-- icon图标 -->
                 <d-icon
                   v-else
-                  v-size="'100%'"
-                  v-color="item.color"
-                  :icon="`icon-${item.key}`"
+                  :style="{
+                    width: item.bgColor ? '60%' : '100%',
+                    height: item.bgColor ? '60%' : '100%',
+                    fontSize: item.bgColor ? '0.6em' : '1em'
+                  }"
+                  v-color="item.color || (item.bgColor ? '#fff' : '')"
+                  :icon="item.iconName || `icon-${item.key}`"
                 />
               </div>
             </div>
@@ -127,7 +128,8 @@
               <span v-show="setContent.iconTitle"> {{ item.title }}</span>
             </p>
           </div>
-        </el-carousel-item>
+        </draggable>
+      </el-carousel-item>
       </el-carousel>
     </div>
   </div>
@@ -142,7 +144,6 @@ export default {
   data() {
     //这里存放数据
     return {
-      windowWidth: window.innerWidth,
       myArray: [],
       initialIndex: 0,
       isEdit: false,
@@ -151,11 +152,24 @@ export default {
       timer: true,
       delta: "", //鼠标滚轮方向
       timeOutEvent: null,
+      dragOptions: {
+        animation: 300,
+        group: "icons",
+        disabled: false,
+        ghostClass: "ghost",
+        chosenClass: "chosen",
+        delay: 100, // 移动端延迟
+        touchStartThreshold: 5,
+        forceFallback: true, // 强制使用回退方案，避免 transform 影响
+        fallbackTolerance: 3, // 移动端容差
+      },
+      localNavList: [], // 本地维护一份列表用于拖拽
+      carouselMoveTimer: null, // 拖拽切页定时器
     };
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    window.addEventListener("resize", this.handleResize);
+    this.localNavList = [...this.$store.state.navList];
     document.addEventListener(
       "click",
       () => {
@@ -166,17 +180,12 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
-  destroyed() {
-    window.removeEventListener("resize", this.handleResize);
-  },
   computed: {
     // 获取所有菜单并分组
     navList() {
-      let navList = this.$store.state.navList;
       let objList = {};
-      let navNum = navList.length; //获取菜单总数
       let pageSize = this.layout[0] * this.layout[1]; //每页数量
-      navList.forEach((item, index) => {
+      this.localNavList.forEach((item, index) => {
         let page = Math.floor(index / pageSize);
         if (objList[page]) {
           objList[page].push(item);
@@ -190,21 +199,6 @@ export default {
     setContent() {
       return this.$store.state.setContent || {};
     },
-    // 计算适配后的图标大小
-    adaptiveIconSize() {
-      const baseSize = this.setContent.iconSize || 60;
-      // 如果不是手机端（假设768px以上），直接返回原大小
-      if (this.windowWidth > 768) return baseSize;
-
-      // 手机端自动缩小逻辑
-      const screenWidth = this.windowWidth;
-      const columns = screenWidth <= 480 ? 3 : 4; // 对应 CSS 中的媒体查询
-      const padding = 40; // 左右内边距总和
-      const availableWidth = screenWidth - padding;
-      const maxIconSize = Math.floor(availableWidth / columns) - 20; // 留出间距
-
-      return Math.min(baseSize, maxIconSize);
-    },
     // 布局设置
     layout() {
       return this.$store.state.setContent.layout || [2, 8];
@@ -213,15 +207,78 @@ export default {
     weatherData() {
       return this.$store.state.weather || {};
     },
+    // 移动端适配图标大小
+    adaptiveIconSize() {
+      const baseSize = this.setContent.iconSize || 75;
+      if (typeof window !== "undefined") {
+        const width = window.innerWidth;
+        if (width < 600) {
+          // 手机端，如果列数较多，缩小图标
+          const cols = this.layout[1] || 4;
+          const maxAllowedSize = (width - 40) / cols - 20;
+          return Math.min(baseSize, maxAllowedSize);
+        }
+      }
+      return baseSize;
+    },
   },
-  watch: {},
+  watch: {
+    "$store.state.navList": {
+      handler(val) {
+        this.localNavList = [...val];
+      },
+      deep: true,
+    },
+  },
   //方法集合
   methods: {
-    handleResize() {
-      this.windowWidth = window.innerWidth;
-    },
     ondrop() {
       console.log(11);
+    },
+
+    onDragStart() {
+      window.addEventListener("mousemove", this.handleDragMove);
+      window.addEventListener("touchmove", this.handleDragMove, { passive: false });
+    },
+
+    onDragEnd() {
+      window.removeEventListener("mousemove", this.handleDragMove);
+      window.removeEventListener("touchmove", this.handleDragMove);
+
+      // 获取当前所有分组的最新顺序并还原为扁平数组
+      const flatList = [];
+      const grouped = this.navList;
+      Object.keys(grouped).forEach((key) => {
+        flatList.push(...grouped[key]);
+      });
+      // 更新本地和 Vuex
+      this.localNavList = [...flatList];
+      this.$store.commit("setNavList", flatList);
+    },
+
+    handleDragMove(e) {
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const width = window.innerWidth;
+      const threshold = 50;
+
+      if (x < threshold) {
+        this.throttleCarouselMove(-1);
+      } else if (x > width - threshold) {
+        this.throttleCarouselMove(1);
+      }
+    },
+
+    throttleCarouselMove(dir) {
+      if (this.carouselMoveTimer) return;
+      this.carouselMoveTimer = setTimeout(() => {
+        const carousel = this.$refs.elCarousel;
+        if (dir === -1) {
+          carousel.prev();
+        } else {
+          carousel.next();
+        }
+        this.carouselMoveTimer = null;
+      }, 1000);
     },
 
     ondragover() {
@@ -338,23 +395,45 @@ export default {
 }
 .app-group {
   margin-top: 30px;
-  width: 100%;
-  max-width: 1300px;
+  width: 1300px;
   padding: 0 20px;
   overflow: hidden;
+
+  .ghost {
+    opacity: 0.3;
+    transform: scale(0.9);
+    transition: all 0.3s;
+  }
+
+  .chosen {
+    transform: scale(1.05);
+    z-index: 100;
+  }
+
+  .app-group-page {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 100px;
+  }
+
   &-item {
     transition-duration: 0.2s;
     text-align: center;
     cursor: pointer;
-    width: calc(100% / 5);
-    @media screen and (max-width: 768px) {
-      width: calc(100% / 4);
-    }
-    @media screen and (max-width: 480px) {
-      width: calc(100% / 3);
-    }
+    width: calc(100% / 8); // 默认 8 列
     display: inline-block;
     margin-top: 30px;
+
+    @media screen and (max-width: 1200px) {
+      width: calc(100% / 6);
+    }
+    @media screen and (max-width: 800px) {
+      width: calc(100% / 4);
+    }
+    @media screen and (max-width: 400px) {
+      width: calc(100% / 3);
+    }
     .group-item-title {
       padding: 0 10px;
       height: 30px;
@@ -367,14 +446,29 @@ export default {
       position: relative;
       .group-item-icon {
         transition-duration: 0.2s;
-        box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
         height: 100%;
         overflow: hidden;
-        -webkit-backdrop-filter: blur(3px);
-        backdrop-filter: blur(3px);
-        &:hover {
-          box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(5px);
+        position: relative;
+        
+        // 模拟 App 图标的渐变和深度感
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+          pointer-events: none;
         }
+
+        &:hover {
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+
         .group-item-icon-font {
           font-weight: 500;
           text-transform: uppercase;

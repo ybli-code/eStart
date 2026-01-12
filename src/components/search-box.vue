@@ -198,13 +198,11 @@ export default {
   position: relative;
   text-align: center;
   padding: 0 20px;
-  width: 100%;
-  max-width: 600px;
+  width: 600px;
   .se-input-box {
     box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 1;
-    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     background-color: rgba(var(--background), 0.4);
     overflow: hidden;
@@ -275,7 +273,6 @@ export default {
         height: 30px;
         width: 80%;
         border-radius: 15px;
-        -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         transition: 0.2s;
         transform: translateY(-20px);
@@ -311,8 +308,7 @@ export default {
     height: 0;
     background-color: rgba(var(--background), 0.3);
     border-radius: 20px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     .se-keyword-item {
       cursor: pointer;
       padding: 0 30px;

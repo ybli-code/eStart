@@ -122,7 +122,6 @@ export default {
   }
   .app-sidebar-main {
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     padding-top: 60px;
     background-color: var(--background-info);
     height: 100%;

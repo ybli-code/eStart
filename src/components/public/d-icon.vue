@@ -6,7 +6,8 @@
  * @Description: file content
 */
 <template>
-  <svg class="d-icon" @click="handleClick" aria-hidden="true">
+  <i v-if="isRemix" :class="[icon]" class="d-icon-remix" @click="handleClick"></i>
+  <svg v-else class="d-icon" @click="handleClick" aria-hidden="true">
     <use :xlink:href="`#${icon}`" />
   </svg>
 </template>
@@ -17,6 +18,11 @@ export default {
 
   props: {
     icon: String,
+  },
+  computed: {
+    isRemix() {
+      return this.icon && (this.icon.startsWith("ri-") || this.icon.startsWith("remix-"));
+    },
   },
   methods: {
     handleClick(evt) {
@@ -33,5 +39,13 @@ export default {
   vertical-align: -0.15em;
   fill: currentColor;
   overflow: hidden;
+}
+.d-icon-remix {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: inherit;
+  color: inherit;
 }
 </style>

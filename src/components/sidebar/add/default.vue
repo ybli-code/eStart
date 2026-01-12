@@ -54,8 +54,7 @@
                   class="group-item-icon d-flex-center d-hidden"
                   v-font="setContent.iconSize"
                   :style="{
-                    backgroundColor: `rgba(var(--background),${setContent.iconOpacity / 100
-                      }`,
+                    backgroundColor: row.bgColor || `rgba(var(--background),${setContent.iconOpacity / 100})`,
                     borderRadius: `${setContent.iconRadius / 2}%`,
                   }"
                 >
@@ -63,7 +62,16 @@
                     <div style="max-width: 300px" slot="content">{{ row.description || row.title }}</div>
                     <img v-size="row.source ? '100%' : '38%'" :src="row.icon" :alt="row.title" />
                   </el-tooltip>
-                  <d-icon v-else v-size="'40%'" v-color="row.color" :icon="`icon-${row.key}`" />
+                  <d-icon 
+                    v-else 
+                    :style="{
+                      width: row.bgColor ? '60%' : '40%',
+                      height: row.bgColor ? '60%' : '40%',
+                      fontSize: row.bgColor ? '0.6em' : '0.4em'
+                    }"
+                    v-color="row.color || (row.bgColor ? '#fff' : '')" 
+                    :icon="row.iconName || `icon-${row.key}`" 
+                  />
                 </div>
                 <p
                   class="group-item-title f12 d-elip"
