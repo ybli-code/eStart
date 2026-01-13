@@ -9,12 +9,12 @@
   <div>
     <section class="set-section">
       <h2>账号与备份</h2>
-      <ul v-if="Object.keys(userInfo).length">
+      <ul v-if="userInfo && Object.keys(userInfo).length">
         <li>
           <el-button type="text">{{
             userInfo.userInfo ? userInfo.userInfo.account : userInfo.account
           }}</el-button>
-          <el-button class="fr" type="priamry" size="mini" @click="logout"
+          <el-button class="fr" type="primary" size="small" @click="logout"
             >退出登陆</el-button
           >
         </li>
@@ -27,7 +27,7 @@
         <li>
           <el-button
             class="wfull"
-            size="medium"
+            size="default"
             type="primary"
             @click="loginHandle('login')"
             >登录</el-button
@@ -37,7 +37,7 @@
           <el-button
             class="wfull"
             type="text"
-            size="medium"
+            size="default"
             @click="loginHandle('reg')"
             >注册</el-button
           >
@@ -47,55 +47,32 @@
   </div>
 </template>
 
-<script>
-//例如：import 《组件名称》 from '《组件路径》';
-export default {
-  name: "",
-  props: {},
-  //import引入的组件需要注入到对象中才能使用
-  components: {},
-  data() {
-    //这里存放数据
-    return {};
-  },
-  //监听属性 类似于data概念
-  computed: {
-    userInfo() {
-      return this.$store.state.userInfo || {};
-    },
-  },
-  //监控data中的数据变化
-  watch: {},
-  //方法集合
-  methods: {
-    loginHandle(type) {
-      let data = {
-        visible: true,
-        type: type,
-      };
-      this.$store.commit("setLoginInfo", data);
-    },
-    logout() {
-      this.$message.success("退出成功");
-      this.$store.commit("setUserInfo", "");
-    },
-    // 手动备份
-    bakHandle() {
-      this.$store.dispatch("saveConfig");
-    },
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-  beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
-};
+<script setup lang="ts">
+import { computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/store/user'
+
+const userStore = useUserStore()
+
+const userInfo = computed(() => userStore.userInfo || {})
+
+const loginHandle = (type: 'login' | 'reg') => {
+  userStore.setLoginInfo({
+    visible: true,
+    type: type,
+  })
+}
+
+const logout = () => {
+  ElMessage.success("退出成功")
+  userStore.logout()
+}
+
+// 手动备份
+const bakHandle = () => {
+  // TODO: 待实现备份逻辑
+  ElMessage.info('备份功能开发中...')
+}
 </script>
 <style lang='less' scoped>
 .login-tip {

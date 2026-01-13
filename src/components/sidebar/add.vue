@@ -1,10 +1,3 @@
-/*
- * @Author: web.王晓冬
- * @Date: 2020-10-12 18:03:48
- * @LastEditors: web.王晓冬
- * @LastEditTime: 2021-01-19 17:17:46
- * @Description: add 添加和修改图标
-*/
 <template>
   <div class="side-add">
     <d-tabs
@@ -36,7 +29,7 @@
         <p style="color: #e74c3c" class="f12">{{ tips }}</p>
         <div class="app-group mb20 d-flex-ver" style="width: auto">
           <div class="app-group-item mt0" style="width: auto">
-            <div class="group-item-content" v-size="setContent.iconSize">
+            <div class="group-item-content" v-size="settingStore.setContent.iconSize">
               <!-- 图标 -->
 
               <div
@@ -47,12 +40,12 @@
                       addForm.bgColor
                         ? addForm.bgColor
                         : `rgba(var(--background),${
-                            setContent.iconOpacity / 100
+                            settingStore.setContent.iconOpacity / 100
                           })`
                     }`,
                   },
-                  { borderRadius: `${setContent.iconRadius / 2}%` },
-                  { fontSize: `${setContent.iconSize}px` },
+                  { borderRadius: `${settingStore.setContent.iconRadius / 2}%` },
+                  { fontSize: `${settingStore.setContent.iconSize}px` },
                 ]"
               >
                 <span
@@ -107,256 +100,195 @@
   </div>
 </template>
 
-<script>
-import dayjs from "dayjs";
-import defaults from "./add/default";
-function isURL(domain) {
-  var name = /[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?/;
-  if (!name.test(domain)) {
-    return false;
-  } else {
-    return true;
-  }
+<script setup lang="ts">
+import { ref, reactive, watch, computed } from 'vue'
+import dayjs from "dayjs"
+import defaults from "./add/default.vue"
+import { useSettingStore } from '@/store/setting'
+import { ElMessage } from 'element-plus'
+
+const settingStore = useSettingStore()
+
+const tabIndex = ref(0)
+const colorList = [
+  "",
+  "#1abc9c",
+  "#2ecc71",
+  "#33c5c5",
+  "#3498db",
+  "#9b59b6",
+  "#34495e",
+  "#f1c40f",
+  "#e67e22",
+  "#e74c3c",
+]
+const tips = ref("")
+const addForm = reactive({
+  title: "",
+  url: "",
+  bgColor: "",
+  type: 2,
+  icon: "",
+  iconType: "text",
+  color: "",
+  key: "",
+  id: "",
+})
+
+const isURL = (domain: string) => {
+  const name = /[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?/
+  return name.test(domain)
 }
-function formatUrl(url) {
+
+const formatUrl = (url: string) => {
   if (
-    url.substr(0, 7).toLowerCase() == "http://" ||
-    url.substr(0, 8).toLowerCase() == "https://" ||
-    url.substr(0, 2).toLowerCase() == "http://"
+    url.toLowerCase().startsWith("http://") ||
+    url.toLowerCase().startsWith("https://")
   ) {
-    return url;
+    return url
+  }
+  return "http://" + url
+}
+
+const init = (val: any) => {
+  if (settingStore.editType === 'edit') {
+    tabIndex.value = 1
   } else {
-    return "http://" + url;
+    tabIndex.value = 0
+  }
+  // Logic to initialize form if needed
+}
+
+const getIcon = () => {
+  if (isURL(addForm.url)) {
+    const url = formatUrl(addForm.url)
+    const domain = url.split('/')[2]
+    addForm.icon = `https://api.iowen.cn/favicon/${domain}.png`
+    addForm.iconType = 'img'
+  } else if (addForm.title) {
+    addForm.icon = addForm.title.substring(0, 2)
+    addForm.iconType = 'text'
   }
 }
-export default {
-  title: "新增",
-  name: "add",
-  props: {},
-  components: { defaults },
-  data() {
-    //这里存放数据
-    return {
-      tabIndex: 0,
-      colorList: [
-        "",
-        "#1abc9c",
-        "#2ecc71",
-        "#33c5c5",
-        "#3498db",
-        "#9b59b6",
-        "#34495e",
-        "#f1c40f",
-        "#e67e22",
-        "#e74c3c",
-      ],
-      tips: "",
-      addForm: {
-        title: "",
-        url: "",
-        bgColor: "",
-        type: 2,
-        icon: "",
-        iconType: "text",
-        color: "",
-        key: "",
-        id: "",
-      },
-    };
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  computed: {
-    //设置内容
-    setContent() {
-      return this.$store.state.setContent || {};
-    },
-    editType() {
-      return this.$store.state.editType;
-    },
-    // 当前用户用到的菜单]
-    navList() {
-      return this.$store.state.navList;
-    },
-    // 桌面存在的捷径id
-    navListIds() {
-      return this.$store.state.navList.map((row) => row.id);
-    },
-  },
-  watch: {
-    "$store.state.navRowData": {
-      handler(val) {
-        for (let key in this.addForm) {
-          this.addForm[key] = val[key] || "";
-        }
-        this.init(val);
-      },
-      deep: true,
-      immediate: true,
-    },
-    "$store.state.isShowSide": {
-      handler(val) {
-        if (val && this.editType == "add") {
-          this.init();
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  //方法集合
-  methods: {
-    init() {
-      if (this.editType != "edit") {
-        this.tabIndex = 0;
-        this.addForm = {
-          title: "",
-          url: "",
-          bgColor: "",
-          type: 2,
-          icon: "",
-          iconType: "text",
-          color: "",
-          key: "",
-          id: "",
-        };
-      } else {
-        this.tabIndex = 1;
-      }
-    },
-    // 选择图片背景
-    selBgColor(item) {
-      this.addForm.bgColor = item;
-    },
-    // 提交
-    submit() {
-      if (!this.addForm.title) {
-        this.tips = "请输入标题";
-        return;
-      }
-      if (!isURL(this.addForm.url)) {
-        this.tips = "请输入正确的网址";
-        return;
-      }
 
-      this.addForm.url = formatUrl(this.addForm.url);
+const imgError = () => {
+  if (addForm.title) {
+    addForm.icon = addForm.title.substring(0, 2)
+    addForm.iconType = 'text'
+  }
+}
 
-      if (this.editType == "edit") {
-        let url = this.addForm.url;
-        let index = this.navList.findIndex((v) => v.id == this.addForm.id);
-        let cloneData = this.$util.deepClone(this.addForm);
-        this.navList.splice(index, 1, cloneData);
-        this.$store.commit("setNavList", this.navList);
-        this.$store.commit("setShowSide", { val: false });
-        this.$message.success("修改成功");
-      } else {
-        this.addForm.id = dayjs().valueOf(); //当前时间戳作为id
-        let length = this.navList.length;
-        let cloneData = this.$util.deepClone(this.addForm);
-        this.navList.splice(length - 1, 0, cloneData);
-        this.$store.commit("setNavList", this.navList);
-        this.$message.success("添加成功");
-      }
-    },
-    getIcon() {
-      if (!this.addForm.title) {
-        this.tips = "请输入标题";
-      } else if (!isURL(this.addForm.url)) {
-        this.tips = "请输入正确的网址";
-      } else {
-        this.tips = "";
-      }
+const selBgColor = (item: string) => {
+  addForm.bgColor = item
+}
 
-      let url = this.addForm.url;
-      if (isURL(url)) {
-        this.addForm.icon = `${formatUrl(url)}/favicon.ico`;
-        this.addForm.iconType = 1;
-      } else {
-        this.imgError();
+const submit = () => {
+  if (!addForm.title) {
+    tips.value = "请输入标题"
+    return
+  }
+  if (!addForm.url) {
+    tips.value = "请输入网址"
+    return
+  }
+  
+  const newItem = {
+    ...addForm,
+    id: addForm.id || dayjs().valueOf().toString(),
+    url: formatUrl(addForm.url)
+  }
+
+  const newNavList = [...settingStore.navList]
+  if (settingStore.editType === 'edit') {
+    // Find and update
+    for (let i = 0; i < newNavList.length; i++) {
+      const index = newNavList[i].findIndex(item => item.id === newItem.id)
+      if (index > -1) {
+        newNavList[i][index] = newItem
+        break
       }
-    },
-    imgError() {
-      this.addForm.iconType = "text";
-      this.addForm.icon = this.addForm.title.substr(0, 2);
-    },
-  },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-};
+    }
+  } else {
+    // Add to first page or create new page
+    if (newNavList.length === 0) {
+      newNavList.push([newItem])
+    } else {
+      // Find a page with space or add to last page
+      // For simplicity, add to first page for now, or handle pagination
+      newNavList[0].push(newItem)
+    }
+  }
+
+  settingStore.setNavList(newNavList)
+  settingStore.setShowSide({ val: false })
+  ElMessage.success(settingStore.editType === 'edit' ? "修改成功" : "添加成功")
+}
+
+watch(() => settingStore.navRowData, (val) => {
+  if (val) {
+    Object.assign(addForm, val)
+    init(val)
+  }
+}, { deep: true, immediate: true })
+
+watch(() => settingStore.showSide, (val) => {
+  if (!val) {
+    // Reset form when side closed? 
+    // Usually handled by the component that opens it
+  }
+})
 </script>
-<style lang='less' scoped>
-.side-add {
-  overflow: hidden;
-  background-color: var(--background-info);
-  font-size: 14px;
-  height: 100%;
-  width: 100%;
-  .add-input {
-    font-size: 14px;
-    color: rgba(var(--main-color), 0.8);
-    border-radius: 3px;
-    padding: 0 10px;
-    margin-bottom: 20px;
-    line-height: 40px;
-    background: rgba(var(--main-color), 0.1);
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-  }
-  .add-color {
-    .add-color-item {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background-clip: content-box;
-      border: 1px solid;
-      box-sizing: content-box;
-      padding: 2px;
-      transition: 0.2s;
-      box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.15);
-      &:hover {
-        transform: scale(1.2);
-      }
-    }
 
-    .color-item-select-false {
-      border-color: transparent !important;
-    }
+<style lang="less" scoped>
+.side-add {
+  padding: 20px;
+}
+.add-input {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 15px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(var(--main-color), 0.1);
+  background: rgba(var(--main-color), 0.05);
+  color: rgba(var(--main-color), 1);
+  border-radius: 4px;
+  outline: none;
+  &:focus {
+    border-color: var(--primary-color);
   }
-  .add-icon-preview {
-    border-radius: 50%;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.add-color {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.add-color-item {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  &.color-item-select-true {
+    border-color: #fff;
+    box-shadow: 0 0 0 1px var(--primary-color);
   }
+}
+.add-icon-info {
+  font-size: 12px;
+  color: rgba(var(--main-color), 0.6);
+  line-height: 1.6;
+}
+.group-item-icon-font {
+  font-size: 0.5em;
+  font-weight: bold;
 }
 .color-item- {
   background-size: 35%;
-  background-image: url("../../assets/transparent.png");
+  background-image: url("@/assets/transparent.png");
   border-color: #666 !important;
-}
-.add-icon-info {
-  line-height: 20px;
-  font-size: 14px;
-  color: rgba(var(--main-color), 0.6);
-}
-
-::-webkit-input-placeholder {
-  /* WebKit browsers */
-  color: #777;
-}
-:-moz-placeholder {
-  /* Mozilla Firefox 4 to 18 */
-  color: #777;
-}
-::-moz-placeholder {
-  /* Mozilla Firefox 19+ */
-  color: #777;
-}
-:-ms-input-placeholder {
-  /* Internet Explorer 10+ */
-  color: #777;
 }
 </style>

@@ -4,82 +4,48 @@
       <!-- 顶部内容 -->
       <Header />
 
-      <!-- <d-iocn class="app-logo iconfont icon-ling"></d-iocn> -->
       <!-- 时间 -->
-      <dateTime />
+      <DateTime />
       <!-- 搜索框功能 -->
-      <searchBox />
+      <SearchBox />
       <!-- 应用列表 -->
       <transition name="app-group-fade">
-        <appGroupNav class="d-cell" v-show="!hideAppGroup" />
+        <AppGroupNav class="d-cell" v-show="!hideAppGroup" />
       </transition>
 
-      <!-- FM -->
-      <!-- <fm /> -->
       <div class="yiyan-container d-cell">
-        <yiyan v-if="yiyan" />
+        <Yiyan v-if="yiyanVisible" />
       </div>
     </div>
     <!-- 便笺贴 -->
-    <pinned />
+    <Pinned />
     <!-- 侧边栏 -->
-    <sideBar />
-    <!-- <music /> -->
-    <login />
+    <SideBar />
+    <Login />
   </div>
 </template>
 
-<script>
-import login from "@/components/login";
-import Header from "@/components/header";
-import dateTime from "@/components/date-time";
-import searchBox from "@/components/search-box";
-import appGroupNav from "@/components/app-group-nav";
-import pinned from "@/components/pinned";
-import music from "@/components/music.vue";
-const yiyan = () => import("@/components/yiyan");
-const fm = () => import("@/components/fm");
-const sideBar = () => import("@/components/sidebar");
+<script setup lang="ts">
+import { computed, defineAsyncComponent } from 'vue'
+import Login from "@/components/login.vue"
+import Header from "@/components/header.vue"
+import DateTime from "@/components/date-time.vue"
+import SearchBox from "@/components/search-box.vue"
+import AppGroupNav from "@/components/app-group-nav.vue"
+import Pinned from "@/components/pinned.vue"
+import { useSettingStore } from '@/store/setting'
 
-export default {
-  name: "",
-  props: {},
-  components: {
-    Header,
-    dateTime,
-    searchBox,
-    appGroupNav,
-    yiyan,
-    fm,
-    sideBar,
-    pinned,
-    login,
-    music,
-  },
-  data() {
-    return {};
-  },
-  created() {},
-  mounted() {},
-  computed: {
-    yiyan() {
-      return this.$store.state.setContent.yiyan;
-    },
-    hideAppGroup() {
-      return this.$store.state.hideAppGroup;
-    },
-  },
-  watch: {},
-  methods: {},
-  beforeCreate() {},
-  beforeMount() {},
-  beforeUpdate() {},
-  updated() {},
-};
+const Yiyan = defineAsyncComponent(() => import("@/components/yiyan.vue"))
+const SideBar = defineAsyncComponent(() => import("@/components/sidebar/index.vue"))
+
+const settingStore = useSettingStore()
+
+const yiyanVisible = computed(() => settingStore.setContent.yiyan)
+const hideAppGroup = computed(() => (settingStore as any).hideAppGroup)
 </script>
-<style lang='less' scoped>
+
+<style lang="less" scoped>
 .app-container {
-  // position: absolute;
   height: 100%;
   width: 100%;
 }
@@ -88,38 +54,17 @@ export default {
   display: flex;
   flex-flow: column;
 }
-.app-container {
-  // position: absolute;
-  height: 100%;
-  width: 100%;
-}
 .app-logo {
   height: 80px;
   width: 180px;
   color: #fff;
   display: inline-block;
+  font-size: 80px;
 }
-
-/* 应用列表显隐动画 */
-.app-group-fade-enter-active,
-.app-group-fade-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center top;
-}
-
-.app-group-fade-enter,
-.app-group-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-20px) scale(0.98);
-}
-
-/* 固定一言位置 */
 .yiyan-container {
-  margin-top: auto; /* 推到最底部 */
-  padding-bottom: 20px;
-  min-height: 60px; /* 保持固定高度，防止显隐时抖动 */
+  flex: 1;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 </style>

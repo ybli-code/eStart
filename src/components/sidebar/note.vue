@@ -1,19 +1,12 @@
-/*
- * @Author: web.王晓冬
- * @Date: 2020-10-12 18:03:48
- * @LastEditors: web.王晓冬
- * @LastEditTime: 2020-10-27 11:20:25
- * @Description: note
-*/
 <template>
   <div class="side-note">
     <ul class="note-list">
       <li class="note-item" @click="addNote">
-        <d-icon v-size="16" class="mr5" icon="icon-add" />
+        <el-icon class="mr5"><Plus /></el-icon>
         新建笔记
       </li>
       <li
-        v-for="(row, index) of noteList"
+        v-for="(row, index) of noteStore.noteList"
         :key="index"
         @click="rowHandle(row, index)"
         class="note-item"
@@ -28,18 +21,16 @@
             v-size="16"
             class="icon mr5"
             :icon="`icon-fixed-${row.fixed ? 'solid' : 'line'}`"
-            @click.native.stop="noteFixed(row, index)"
+            @click.stop="noteFixed(row, index)"
             :title="`${row.fixed ? '取消' : '固定'}到桌面`"
           />
 
-          <d-icon
+          <el-icon
             v-if="index != noteIndex"
-            v-size="16"
             class="icon"
-            icon="icon-close"
-            @click.native="noteDelete(row, index)"
+            @click.stop="noteDelete(index)"
             title="删除"
-          />
+          ><Close /></el-icon>
         </p>
       </li>
     </ul>
@@ -54,78 +45,67 @@
   </div>
 </template>
 
-<script>
-import dayjs from "dayjs";
-export default {
-  title: "便笺",
-  name: "",
-  props: {},
-  components: {},
-  data() {
-    //这里存放数据
-    return {
-      value: "",
-      noteIndex: 0,
-    };
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-    this.init();
-  },
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  computed: {
-    noteList() {
-      return this.$store.state.note;
-    },
-  },
-  watch: {},
-  //方法集合
-  methods: {
-    init() {
-      // 获取note
-      this.noteIndex = 0;
-    },
-    localSave() {
-      this.$store.commit("setNote", this.noteList);
-    },
-    // 新建笔记
-    addNote() {
-      let textJson = {
-        text: "",
-        created: dayjs().valueOf(),
-      };
-      this.noteList.unshift(textJson);
-      this.value = "";
-      this.localSave();
-    },
-    rowHandle(row, index) {
-      this.noteIndex = index;
-      this.value = row.text;
-    },
-    textInput() {
-      this.noteList[this.noteIndex].text = this.value;
-      this.noteList[this.noteIndex].created = dayjs().valueOf();
-      this.localSave();
-    },
-    noteFixed(row, index) {
-      row.fixed = !row.fixed;
-      row.animation = false;
-      this.noteList.splice(index, 1, row);
-      this.localSave();
-    },
-    // 删除note
-    noteDelete(row, index) {
-      this.noteList.splice(index, 1);
-      this.localSave();
-    },
-  },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-};
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import dayjs from "dayjs"
+import { Plus, Close } from '@element-plus/icons-vue'
+import { useNoteStore, NoteItem } from '@/store/note'
+
+const noteStore = useNoteStore()
+
+const value = ref("")
+const noteIndex = ref(0)
+
+const init = () => {
+  noteIndex.value = 0
+  if (noteStore.noteList.length > 0) {
+    value.value = noteStore.noteList[0].text
+  }
+}
+
+const addNote = () => {
+  const newNote: NoteItem = {
+    text: "",
+    created: dayjs().valueOf(),
+    fixed: false,
+  }
+  noteStore.noteList.unshift(newNote)
+  noteIndex.value = 0
+  value.value = ""
+}
+
+const rowHandle = (row: NoteItem, index: number) => {
+  noteIndex.value = index
+  value.value = row.text
+}
+
+const textInput = () => {
+  if (noteStore.noteList[noteIndex.value]) {
+    noteStore.noteList[noteIndex.value].text = value.value
+    noteStore.noteList[noteIndex.value].created = dayjs().valueOf()
+  }
+}
+
+const noteFixed = (row: NoteItem, index: number) => {
+  row.fixed = !row.fixed
+  row.animation = false
+}
+
+const noteDelete = (index: number) => {
+  noteStore.deleteNote(index)
+  if (noteIndex.value === index) {
+    noteIndex.value = 0
+    value.value = noteStore.noteList[0]?.text || ""
+  } else if (noteIndex.value > index) {
+    noteIndex.value--
+  }
+}
+
+onMounted(() => {
+  init()
+})
 </script>
+
 <style lang='less' scoped>
 .side-note {
   display: flex;
@@ -173,6 +153,9 @@ export default {
   .note-input {
     flex: 1;
     textarea {
+      background: transparent;
+      border: none;
+      outline: none;
       color: rgba(var(--main-color), 0.8);
       padding: 20px 10px;
       box-sizing: border-box;
@@ -180,6 +163,7 @@ export default {
       display: block;
       width: 100% !important;
       height: 100% !important;
+      resize: none;
     }
   }
 }

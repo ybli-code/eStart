@@ -2,9 +2,8 @@
   <div class="app-yiyan ac">
     <div
       class="yiyan-text f12"
-      v-clipboard:copy="yiyan.hitokoto"
-      @contextmenu="yiyanHandle"
-      v-clipboard:success="onCopy"
+      @click="copyText(yiyan.hitokoto)"
+      @contextmenu.prevent="yiyanHandle"
       title="点击左键复制，右键切换"
     >
       「 {{ yiyan.hitokoto }} 」
@@ -13,46 +12,49 @@
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import api from '@/api'
+import { ElMessage } from 'element-plus'
 
-export default {
-  name: "",
-  props: {},
-  components: {},
-  data() {
-    return {
-      yiyan: {},
-    };
-  },
-  created() {
-    this.getYiyan();
-  },
-  mounted() {},
-  computed: {},
-  watch: {},
-  methods: {
-    yiyanHandle() {
-      this.getYiyan();
-    },
-    getYiyan() {
-      this.$http.getYiyan().then((res) => {
-        this.yiyan = res || {};
-      });
-    },
-    onCopy() {
-      this.$message.success("一言已复制到剪切板");
-    },
-  },
-  beforeCreate() {},
-  beforeMount() {},
-  beforeUpdate() {},
-  updated() {},
-  beforeDestroyed() {},
-};
+interface YiyanData {
+  hitokoto: string
+  from: string
+}
+
+const yiyan = ref<YiyanData>({
+  hitokoto: '',
+  from: ''
+})
+
+const getYiyan = async () => {
+  try {
+    const res = await api.getYiyan()
+    yiyan.value = res || { hitokoto: '', from: '' }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const yiyanHandle = () => {
+  getYiyan()
+}
+
+const copyText = (text: string) => {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    ElMessage.success("一言已复制到剪切板")
+  }).catch(() => {
+    ElMessage.error("复制失败")
+  })
+}
+
+onMounted(() => {
+  getYiyan()
+})
 </script>
+
 <style lang='less' scoped>
-//@import url();
 .app-yiyan {
   overflow: hidden;
   cursor: pointer;
@@ -76,5 +78,11 @@ export default {
       opacity: 1;
     }
   }
+}
+.ac {
+  text-align: center;
+}
+.f12 {
+  font-size: 12px;
 }
 </style>

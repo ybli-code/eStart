@@ -1,35 +1,35 @@
-/*
+<!--
  * @Author: web.王晓冬
  * @Date: 2020-10-12 18:03:48
  * @LastEditors: web.王晓冬
  * @LastEditTime: 2021-06-10 14:46:22
  * @Description: 天气
-*/
+-->
 <template>
   <div
     class="side-weather ac"
     :style="{
       backgroundImage: `url(
-          https://cdn.heweather.com/img/plugin/190516/bg/h5/${weatherData.now.cond_code}${moment}.png
+          https://cdn.heweather.com/img/plugin/190516/bg/h5/${settingStore.weatherData.now.cond_code}${settingStore.moment}.png
         )`,
     }"
   >
-    <div class="side-weather-city f30 mt30">{{ weatherData.location }}</div>
+    <div class="side-weather-city f30 mt30">{{ settingStore.weatherData.location }}</div>
     <div class="side-weather-wea d-flex-center mt10 mb10 f14">
       <d-icon
         v-size="22"
         class="mr5"
-        :icon="`icon-${$weatherIcon[weatherData.now.cond_code]}`"
+        :icon="`icon-${weatherIconMap[settingStore.weatherData.now.cond_code as keyof typeof weatherIconMap] || 'qing'}`"
       />
-      {{ weatherData.now.cond_txt }}
+      {{ settingStore.weatherData.now.cond_txt }}
     </div>
 
     <div class="side-weather-tem mb10 b" style="font-size: 60px">
-      {{ weatherData.now.tmp }}°
+      {{ settingStore.weatherData.now.tmp }}°
     </div>
-    <div class="side-weather-tem f13" v-if="weatherData.daily_forecast">
-      最高{{ weatherData.daily_forecast[0].tmp_max }}° 最低{{
-        weatherData.daily_forecast[0].tmp_min
+    <div class="side-weather-tem f13" v-if="settingStore.weatherData.daily_forecast">
+      最高{{ settingStore.weatherData.daily_forecast[0].tmp_max }}° 最低{{
+        settingStore.weatherData.daily_forecast[0].tmp_min
       }}°
     </div>
     <!-- 气压 -->
@@ -37,31 +37,31 @@
       <li class="box-item">
         <d-icon v-size="26" icon="icon-fengxiang" />
         <p>风向</p>
-        <p>{{ weatherData.now.wind_dir }}{{ weatherData.now.wind_sc }}级</p>
+        <p>{{ settingStore.weatherData.now.wind_dir }}{{ settingStore.weatherData.now.wind_sc }}级</p>
       </li>
       <li class="box-item">
         <d-icon v-size="26" icon="icon-air" />
 
         <p>空气质量</p>
-        <p>
-          {{ weatherData.air_now_city.qlty }}/{{ weatherData.air_now_city.aqi }}
+        <p v-if="settingStore.weatherData.air_now_city">
+          {{ settingStore.weatherData.air_now_city.qlty }}/{{ settingStore.weatherData.air_now_city.aqi }}
         </p>
       </li>
       <li class="box-item">
         <d-icon v-size="26" icon="icon-shidu" />
         <p>湿度</p>
 
-        <p>{{ weatherData.now.hum }}%</p>
+        <p>{{ settingStore.weatherData.now.hum }}%</p>
       </li>
     </ul>
     <!-- 当天小时天气 -->
     <ul class="side-weather-hours d-auto-x i-scrollbar-hide">
-      <template v-for="(row, index) of weatherData.hourly">
-        <li class="hours-item" v-if="index < 16" :key="row.date">
+      <template v-for="(row, index) of settingStore.weatherData.hourly">
+        <li class="hours-item" v-if="index < 16" :key="row.time">
           <p class="d-elip">
-            {{ new Date(row.time).getTime() | timeToStr("HH") }}时
+            {{ dayjs(row.time).format("HH") }}时
           </p>
-          <d-icon v-size="22" :icon="`icon-${$weatherIcon[row.cond_code]}`" />
+          <d-icon v-size="22" :icon="`icon-${weatherIconMap[row.cond_code as keyof typeof weatherIconMap] || 'qing'}`" />
           <p>{{ row.tmp }}°</p>
         </li>
       </template>
@@ -70,7 +70,7 @@
     <ul class="side-weather-week">
       <li
         class="week-item"
-        v-for="row of weatherData.daily_forecast"
+        v-for="row of settingStore.weatherData.daily_forecast"
         :key="row.date"
       >
         <span>{{
@@ -78,57 +78,25 @@
             dayjs(row.date).day()
           ]
         }}</span>
-        <d-icon v-size="24" :icon="`icon-${$weatherIcon[row.cond_code_d]}`" />
+        <d-icon v-size="24" :icon="`icon-${weatherIconMap[row.cond_code_d as keyof typeof weatherIconMap] || 'qing'}`" />
         <span>{{ row.tmp_min }}~{{ row.tmp_max }}</span>
       </li>
     </ul>
-    <ul class="side-weather-sun d-flex-between">
-      <li>日出: {{ weatherData.sun.rise }}</li>
-      <li>日落: {{ weatherData.sun.set }}</li>
+    <ul class="side-weather-sun d-flex-between" v-if="settingStore.weatherData.sun">
+      <li>日出: {{ settingStore.weatherData.sun.rise }}</li>
+      <li>日落: {{ settingStore.weatherData.sun.set }}</li>
     </ul>
   </div>
 </template>
 
-<script>
-import dayjs from "dayjs";
-export default {
-  title: "天气",
-  name: "weather",
-  props: {},
-  components: {},
-  data() {
-    //这里存放数据
-    return {
-      weatherWeekList: [],
-      weatherHours: {},
-      dayjs: dayjs,
-    };
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-    // this.getWeekWeather();
-  },
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  computed: {
-    // 天气数据
-    weatherData() {
-      return this.$store.state.weather || {};
-    },
-    // 当前时刻 n:夜晚 d:白天
-    moment() {
-      return this.$store.state.moment;
-    },
-  },
-  watch: {},
-  //方法集合
-  methods: {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-};
+<script setup lang="ts">
+import dayjs from "dayjs"
+import { useSettingStore } from '@/store/setting'
+import { weatherIconMap } from '@/utils/constants'
+
+const settingStore = useSettingStore()
 </script>
+
 <style lang='less' scoped>
 .side-weather {
   overflow: hidden;

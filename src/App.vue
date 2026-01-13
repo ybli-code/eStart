@@ -1,107 +1,88 @@
 <template>
-  <div @contextmenu="doNothing()" class="app-box" :class="themeMode">
-    <div class="app-bg" :style="{ filter: `blur(${$store.state.setContent.bgBlur}px)` }">
+  <div @contextmenu.prevent="doNothing" class="app-box" :class="themeMode">
+    <div class="app-bg" :style="{ filter: `blur(${settingStore.setContent.bgBlur}px)` }">
       <video
         v-if="wallpaper.type == 2"
         class="app-bg-video"
-        autoplay="true"
-        loop="true"
-        muted="true"
+        autoplay
+        loop
+        muted
         :src="wallpaper.src"
+        @error="videoError"
       ></video>
       <div v-else class="app-bg-img" :style="{ backgroundImage: `url(${wallpaper.src})` }"></div>
     </div>
 
     <div class="app-cover">
       <el-tooltip placement="top" v-if="wallpaper.copyright || wallpaper.title">
-        <div slot="content">
-          {{ wallpaper.title || wallpaper.copyright }}
-          <br />
-          <d-icon v-size="12" icon="icon-local" v-if="wallpaper.local">
-            {{
-              wallpaper.local
-            }}
-          </d-icon>
-        </div>
+        <template #content>
+          <div>
+            {{ wallpaper.title || wallpaper.copyright }}
+            <br />
+            <d-icon v-size="12" icon="icon-local" v-if="wallpaper.local">
+              {{ wallpaper.local }}
+            </d-icon>
+          </div>
+        </template>
         <d-icon v-size="24" icon="icon-about" class="wallpaper-info"></d-icon>
       </el-tooltip>
       <Home />
     </div>
   </div>
 </template>
- <script>
-import Home from "@/views/home.vue";
 
-import { imgList, videoList } from "@/json";
-import dayjs from "dayjs";
+<script setup lang="ts">
+import { computed, onMounted, watch } from 'vue'
+import Home from "@/views/home.vue"
+import { imgList } from "@/json"
+import { useSettingStore } from '@/store/setting'
 
-export default {
-  name: "",
-  props: {},
-  components: {
-    Home,
-  },
-  data() {
-    return {
-      imgList: imgList,
-      videoList: videoList,
-    };
-  },
-  created() {
-  },
-  mounted() {
-    document.querySelector("html").classList = this.themeMode;
-  },
-  computed: {
-    wallpaper() {
-      let wallpaper = this.imgList[0];
-      wallpaper.type = 0;
-      let storeWallpaper = this.$store.state.wallpaper;
-      if (storeWallpaper && storeWallpaper.src) {
-        return storeWallpaper;
-      }
-      return wallpaper;
-    },
-    themeMode() {
-      if (this.$store.state.setContent.sunrise) {
-        if (this.$store.state.moment == "d") {
-          return "light";
-        } else {
-          return "dark";
-        }
-      }
-      return this.$store.state.setContent.themeMode;
-    },
-  },
-  watch: {
-    themeMode(val) {
-      document.querySelector("html").classList = val;
-    },
-  },
-  methods: {
-    videoError() {
-      this.$store.commit("setWallpaper", this.imgList[0]);
-    },
-    // 禁用右键菜单
-    doNothing() {
-      window.event.returnValue = false;
-      return false;
-    },
+const settingStore = useSettingStore()
 
-  },
-  beforeCreate() { }, //生命周期 - 创建之前
-  beforeMount() { }, //生命周期 - 挂载之前
-  beforeUpdate() { }, //生命周期 - 更新之前
-  updated() { }, //生命周期 - 更新之后
-};
+const wallpaper = computed(() => {
+  const defaultWallpaper = { ...imgList[0], type: 0 }
+  if (settingStore.wallpaper && settingStore.wallpaper.src) {
+    return settingStore.wallpaper
+  }
+  return defaultWallpaper
+})
+
+const themeMode = computed(() => {
+  if (settingStore.setContent.sunrise) {
+    return settingStore.moment === 'd' ? 'light' : 'dark'
+  }
+  return settingStore.setContent.themeMode
+})
+
+watch(themeMode, (val) => {
+  if (val) {
+    document.querySelector("html")?.setAttribute('class', val)
+  }
+}, { immediate: true })
+
+onMounted(() => {
+  if (themeMode.value) {
+    document.querySelector("html")?.setAttribute('class', themeMode.value)
+  }
+})
+
+const doNothing = () => {
+  // Prevent default is handled by @contextmenu.prevent
+}
+
+const videoError = () => {
+  settingStore.setWallpaper({ ...imgList[0], type: 0 })
+}
 </script>
+
 <style lang="less" scoped>
 .app-box {
-  overflow: hidden;
   position: relative;
   height: 100%;
   width: 100%;
   background-color: #333;
+  overflow: hidden;
+
   .app-bg {
     position: absolute;
     backface-visibility: hidden;
@@ -137,26 +118,12 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
-    // background-color: rgba(0, 0, 0, 0.1);
-    // background-image: radial-gradient(
-    //     rgba(0, 0, 0, 0) 0%,
-    //     rgba(0, 0, 0, 0.2) 100%
-    //   ),
-    //   radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.2) 166%),
-    //   linear-gradient(
-    //     180deg,
-    //     rgba(0, 0, 0, 0) 0%,
-    //     rgba(0, 0, 0, 0) 0% 75%,
-    //     rgba(0, 0, 0, 0) 0%,
-    //     rgba(0, 0, 0, 0.3) 100%
-    //   );
   }
 }
 .wallpaper-info {
   position: absolute;
   transition-duration: 0.2s;
   color: rgba(255, 255, 255, 0.2);
-
   right: 10%;
   bottom: 10%;
   &:hover {

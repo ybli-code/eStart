@@ -1,10 +1,10 @@
-/*
+<!--
  * @Author: web.王晓冬
  * @Date: 2020-10-12 18:03:48
  * @LastEditors: web.王晓冬
  * @LastEditTime: 2020-12-04 14:47:33
  * @Description: setting 设置
-*/
+-->
 <template>
   <div class="side-comp-box">
     <!-- 账号与备份 -->
@@ -20,7 +20,7 @@
         <li class="d-flex-between">
           初始化设置
 
-          <el-button size="mini" type="primary" @click="resetSet"
+          <el-button size="small" type="primary" @click="resetSet"
             >重置</el-button
           >
         </li>
@@ -31,58 +31,37 @@
   </div>
 </template>
 
-<script>
-import user from "./user";
-import exterior from "./exterior";
-import wallpaper from "./wallpaper";
-import theme from "./theme";
-import about from "./about";
+<script setup lang="ts">
+import { ElMessageBox, ElMessage } from 'element-plus'
+import user from "./user.vue"
+import exterior from "./exterior.vue"
+import wallpaper from "./wallpaper.vue"
+import theme from "./theme.vue"
+import about from "./about.vue"
+import { useSettingStore } from '@/store/setting'
 
-export default {
-  name: "",
-  props: {},
-  components: { exterior, wallpaper, theme, about, user },
-  data() {
-    //这里存放数据
-    return {};
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
+const settingStore = useSettingStore()
 
-  watch: {},
-  //方法集合
-  methods: {
-    resetSet() {
-      this.$confirm(
-        "此操作将清空您的喜好设置!  您的便笺和待办事项不会清空,是否继续?",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-          center: true,
-        }
-      ).then(() => {
-        this.$message({
-          type: "success",
-          message: "删除成功!",
-        });
-      });
-      // let submit = confirm(
-      //   "此操作将清空您的喜好设置!  您的便笺和待办事项不会清空"
-      // );
-      // if (submit) {
-      //   this.$local.remove("setContent");
-      //   this.$local.remove("navList");
-      //   this.$local.remove("wallpaper");
-      //   location.reload();
-      // }
-    },
-  },
-};
+const resetSet = () => {
+  ElMessageBox.confirm(
+    "此操作将清空您的喜好设置! 您的便笺和待办事项不会清空, 是否继续?",
+    "提示",
+    {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+      center: true,
+    }
+  ).then(() => {
+    // Reset setting store logic would go here if needed
+    // For now, just mimicking the existing logic which was just a message
+    ElMessage.success("重置成功!")
+  }).catch(() => {
+    // Cancelled
+  })
+}
 </script>
+
 <style lang='less'>
 .side-comp-box {
   padding: 0 20px 10px;

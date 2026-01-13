@@ -3,88 +3,60 @@
     <transition name="el-fade-in">
       <div
         class="app-sidebar-cover"
-        @click="$store.commit('setShowSide', { val: false })"
-        v-show="showSidebar"
+        @click="settingStore.setShowSide({ val: false })"
+        v-show="settingStore.showSide"
       ></div>
     </transition>
 
-    <div class="app-sidebar-content" :class="{ active: showSidebar }">
+    <div class="app-sidebar-content" :class="{ active: settingStore.showSide }">
       <h2 class="sidebar-title">
-        {{ title[sideComp] }}
+        {{ titles[settingStore.sideComp] || '设置' }}
         <div class="ar fr">
-          <d-icon
+          <el-icon
             class="sidebar-close"
-            icon="icon-close"
-            v-size="24"
             title="关闭"
-            @click.native="$store.commit('setShowSide', { val: false })"
+            @click="settingStore.setShowSide({ val: false })"
           >
-          </d-icon>
+            <Close />
+          </el-icon>
         </div>
       </h2>
       <div class="app-sidebar-main">
-        <keep-alive>
-          <templates ref="comp" :is="sideComp"></templates>
-        </keep-alive>
+        <component :is="activeComponent" />
       </div>
     </div>
   </div>
 </template>
 
-<script>
-// const weather = () => import("@/components/sidebar/weather");
-// const todo = () => import("@/components/sidebar/todo");
-// const note = () => import("@/components/sidebar/note");
-const setting = () => import("@/components/sidebar/setting");
-// const add = () => import("@/components/sidebar/add");
-const indexFiles = require.context(`./`, false, /(?<!index)\.vue$/);
-const comps = indexFiles.keys().reduce((obj, key) => {
-  let comp = indexFiles(key).default;
-  let name = key.match(/.\/(\S*).vue/)[1];
-  obj[name] = comp;
-  return obj;
-}, {});
-export default {
-  title: "设置",
-  name: "sidebar",
-  props: {},
-  components: { ...comps, setting },
-  data() {
-    return {
-      title: {
-        weather: "天气",
-        todo: "待办事项",
-        note: "便笺",
-        setting: "设置",
-        add: "新增",
-      },
-    };
-  },
-  created() {},
-  mounted() {},
-  computed: {
-    showSidebar() {
-      return this.$store.state.isShowSide || false;
-    },
-    sideComp() {
-      return this.$store.state.sideComp || "";
-    },
-  },
-  watch: {
-    "$store.state.editType": {
-      handler(val) {
-        this.title.add = val == "add" ? "新增" : "编辑";
-      },
-    },
-  },
-  methods: {},
-  beforeCreate() {},
-  beforeMount() {},
-  beforeUpdate() {},
-  updated() {},
-};
+<script setup lang="ts">
+import { computed, defineAsyncComponent } from 'vue'
+import { Close } from '@element-plus/icons-vue'
+import { useSettingStore } from '@/store/setting'
+
+const settingStore = useSettingStore()
+
+const titles: Record<string, string> = {
+  weather: "天气",
+  todo: "待办事项",
+  note: "便笺",
+  setting: "设置",
+  add: "新增",
+}
+
+const componentsMap: Record<string, any> = {
+  weather: defineAsyncComponent(() => import("./weather.vue")),
+  todo: defineAsyncComponent(() => import("./todo.vue")),
+  note: defineAsyncComponent(() => import("./note.vue")),
+  setting: defineAsyncComponent(() => import("./setting/index.vue")),
+  add: defineAsyncComponent(() => import("./add.vue")),
+}
+
+const activeComponent = computed(() => {
+  return componentsMap[settingStore.sideComp] || null
+})
 </script>
-<style lang='less' scoped>
+
+<style lang="less" scoped>
 .app-sidebar-cover {
   position: fixed;
   left: 0;
@@ -96,52 +68,40 @@ export default {
 }
 .app-sidebar-content {
   background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
   box-shadow: 10px 10px 20px 20px rgba(0, 0, 0, 0.1);
   position: absolute;
-  transition: transform 0.2s;
-  z-index: 100;
-  transform: translateZ(0);
-  transform: translateX(100%);
   top: 0;
-  bottom: 0;
-  right: 0;
+  right: -400px;
   width: 400px;
+  height: 100%;
+  z-index: 100;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
   &.active {
-    transform: translateX(0);
-  }
-  .app-sidebar-main {
-    overflow-y: auto;
-    padding-top: 60px;
-    background-color: var(--background-info);
-    height: 100%;
-    width: 100%;
+    right: 0;
   }
 }
 .sidebar-title {
-  position: absolute;
-  z-index: 2001;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background-color: #1e1e1e;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  line-height: 60px;
-  // color: rgba(var(--main-color), 1);
+  padding: 20px;
   color: #fff;
-  font-size: 24px;
-  padding: 0 20px;
-}
-.sidebar-close {
-  display: inline-block;
-  transition: 0.2s;
-  &:hover {
-    transform: rotate(90deg);
+  font-size: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .sidebar-close {
+    cursor: pointer;
+    font-size: 24px;
+    opacity: 0.6;
+    transition: 0.2s;
+    &:hover {
+      opacity: 1;
+      transform: rotate(90deg);
+    }
   }
 }
-@media screen and (max-width: 641px) {
-  .app-sidebar-content {
-    width: 80%;
-  }
+.app-sidebar-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
 }
 </style>

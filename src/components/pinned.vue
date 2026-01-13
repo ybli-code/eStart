@@ -1,23 +1,22 @@
-/*
+<!--
  * @Author: web.王晓冬
  * @Date: 2020-10-23 10:09:07
  * @LastEditors: web.王晓冬
  * @LastEditTime: 2020-10-30 09:09:43
  * @Description: pinned
-*/
+-->
 <template>
   <div class="app-pinned">
-    <template v-for="(row, index) of noteList">
+    <template v-for="(row, index) of noteList" :key="row.created">
       <div
         :class="{ zoomOut: row.animation }"
         class="pinned-item"
         v-if="row.fixed"
-        :key="row.created"
       >
         <d-icon
           class="icon-close"
           icon="icon-close"
-          @click.native="noteFixed(row, index)"
+          @click="noteFixed(row, index)"
         ></d-icon>
         <div
           @blur="noteInput($event, row, index)"
@@ -27,55 +26,42 @@
           {{ row.text }}
         </div>
         <time class="pinned-time">{{
-          row.created | timeToStr("YYYY-MM-DD HH:MM")
+          formatTime(row.created, "YYYY-MM-DD HH:mm")
         }}</time>
       </div>
     </template>
   </div>
 </template>
 
-<script>
-export default {
-  name: "",
-  props: {},
-  components: {},
-  data() {
-    //这里存放数据
-    return {};
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  computed: {
-    noteList() {
-      return this.$store.state.note;
-    },
-  },
-  watch: {},
-  //方法集合
-  methods: {
-    noteInput(e, row, index) {
-      row.text = e.target.textContent;
-      this.noteList.splice(index, 1, row);
-      //   this.$store.commit("setNote", this.noteList);
-    },
-    noteFixed(row, index) {
-      row.animation = true;
-      this.noteList.splice(index, 1, row);
-      setTimeout(() => {
-        row.fixed = !row.fixed;
-        this.noteList.splice(index, 1, row);
-        this.$store.commit("setNote", this.noteList);
-      }, 180);
-    },
-  },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-};
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useNoteStore, type NoteItem } from '@/store/note'
+import dayjs from 'dayjs'
+
+const noteStore = useNoteStore()
+const noteList = computed(() => noteStore.noteList)
+
+const formatTime = (value: number, formatString = 'YYYY-MM-DD') => {
+  if (!value) return ''
+  return dayjs(value).format(formatString)
+}
+
+const noteInput = (e: any, row: NoteItem, index: number) => {
+  const newRow = { ...row, text: e.target.textContent }
+  noteStore.updateNote(index, newRow)
+}
+
+const noteFixed = (row: NoteItem, index: number) => {
+  const animatingRow = { ...row, animation: true }
+  noteStore.updateNote(index, animatingRow)
+  
+  setTimeout(() => {
+    const fixedRow = { ...animatingRow, animation: false, fixed: !animatingRow.fixed }
+    noteStore.updateNote(index, fixedRow)
+  }, 180)
+}
 </script>
+
 <style lang='less' scoped>
 .app-pinned {
   position: absolute;

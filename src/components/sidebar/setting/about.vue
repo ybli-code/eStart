@@ -14,7 +14,7 @@
         <li @click="opentModal('捐助我')">捐助我</li>
       </ul>
     </section>
-    <el-dialog width="520px" :visible.sync="visible" :title="title">
+    <el-dialog width="520px" v-model="visible" :title="title">
       <div class="ac f14" v-show="title == '反馈与建议'">
         <p class="mb20">
           如需反馈问题、提供建议，请加作者微信：xdlumia,进入微信群
@@ -33,36 +33,18 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "",
-  props: {},
-  components: {},
-  data() {
-    return {
-      version: process.env.VUE_APP_VERSION,
-      visible: false,
-      title: "捐助我",
-    };
-  },
-  computed: {},
-  watch: {},
-  methods: {
-    opentModal(title) {
-      this.title = title;
-      this.visible = true;
-    },
-  },
-  created() {},
-  mounted() {},
-  beforeCreate() {},
-  beforeMount() {},
-  beforeUpdate() {},
-  updated() {},
-  beforeDestroy() {},
-  destroyed() {},
-  activated() {},
-};
+<script setup lang="ts">
+import { ref } from 'vue'
+import packageJson from '../../../../../package.json'
+
+const version = ref(packageJson.version)
+const visible = ref(false)
+const title = ref("捐助我")
+
+const opentModal = (val: string) => {
+  title.value = val
+  visible.value = true
+}
 </script>
 <style lang='less' scoped>
 .set-about {

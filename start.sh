@@ -66,10 +66,10 @@ echo "======================================"
 echo "   启动 e-start 服务 ($ENV_MODE)"
 echo "======================================"
 
-# 清理端口 8081 (后端) 和 8088 (前端)
+# 清理端口 8081 (后端) 和 5173 (Vite 默认前端)
 check_and_kill_port 8081
 if [ "$ENV_MODE" = "development" ]; then
-    check_and_kill_port 8088
+    check_and_kill_port 5173
 fi
 
 # 1. 检查依赖
@@ -96,11 +96,11 @@ fi
 if [ "$ENV_MODE" = "production" ]; then
     if [ ! -d "search" ]; then
         echo "未检测到构建产物 (search 目录)，正在构建 Web 端..."
-        npm run build:web
+        npm run build
     else
         echo "检测到现有构建产物，正在清理并重新构建 Web 端..."
         rm -rf search
-        npm run build:web
+        npm run build
     fi
 fi
 
@@ -112,13 +112,15 @@ if [ "$ENV_MODE" = "development" ]; then
     
     # 后端启动 (后台)
     cd server
-    node app.js &
+    node app.js > backend.log 2>&1 &
+    BACKEND_PID=$!
+    echo "后端服务已启动 (PID: $BACKEND_PID, Log: server/backend.log)"
     sleep 2
     cd ..
     
     # 前端启动 (占用前台)
     echo "启动前端开发服务器..."
-    npm run serve
+    npm run dev
 else
     # === 生产模式 ===
     echo "[Production] 启动模式: 正式部署 (Node.js 托管静态资源)"

@@ -1,10 +1,3 @@
-/*
- * @Author: web.王晓冬
- * @Date: 2020-10-27 10:31:35
- * @LastEditors: web.王晓冬
- * @LastEditTime: 2020-10-28 10:22:49
- * @Description: file content
-*/
 <template>
   <i v-if="isRemix" :class="[icon]" class="d-icon-remix" @click="handleClick"></i>
   <svg v-else class="d-icon" @click="handleClick" aria-hidden="true">
@@ -12,25 +5,26 @@
   </svg>
 </template>
 
-<script>
-export default {
-  name: "dIcon",
+<script setup lang="ts">
+import { computed } from 'vue'
 
-  props: {
-    icon: String,
-  },
-  computed: {
-    isRemix() {
-      return this.icon && (this.icon.startsWith("ri-") || this.icon.startsWith("remix-"));
-    },
-  },
-  methods: {
-    handleClick(evt) {
-      this.$emit("click", evt);
-    },
-  },
-};
+const props = defineProps<{
+  icon?: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'click', event: MouseEvent): void
+}>()
+
+const isRemix = computed(() => {
+  return props.icon && (props.icon.startsWith("ri-") || props.icon.startsWith("remix-"))
+})
+
+const handleClick = (event: MouseEvent) => {
+  emit('click', event)
+}
 </script>
+
 <style lang="less" scoped>
 .d-icon {
   cursor: pointer;

@@ -1,61 +1,34 @@
-/*
- * @Author: web.王晓冬
- * @Date: 2020-10-27 16:37:58
- * @LastEditors: web.王晓冬
- * @LastEditTime: 2020-10-27 16:57:46
- * @Description: file content
-*/
 <template>
   <ul class="d-tabs">
     <li
       class="d-tabs-item"
       v-for="(row, index) of data"
       :key="index"
-      :class="{ active: value == index }"
+      :class="{ active: modelValue == index }"
       @click="tabClick(row, index)"
     >
-      {{ row.label || row }}
+      {{ (row as any).label || row }}
     </li>
   </ul>
 </template>
 
-<script>
-export default {
-  name: "",
-  props: {
-    value: {
-      required: true,
-    },
-    data: {
-      required: true,
-      type: [Array, Object],
-      default: () => [],
-    },
-  },
-  components: {},
-  data() {
-    return {};
-    //这里存放数据
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  computed: {},
-  watch: {},
-  //方法集合
-  methods: {
-    tabClick(row, index) {
-      this.$emit("input", index);
-      this.$emit("tab-click", row, index);
-    },
-  },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-};
+<script setup lang="ts">
+const props = defineProps<{
+  modelValue: string | number
+  data: any[] | Record<string, any>
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number): void
+  (e: 'tab-click', row: any, index: string | number): void
+}>()
+
+const tabClick = (row: any, index: string | number) => {
+  emit('update:modelValue', index)
+  emit('tab-click', row, index)
+}
 </script>
+
 <style lang='less' scoped>
 .d-tabs {
   .d-tabs-item {
