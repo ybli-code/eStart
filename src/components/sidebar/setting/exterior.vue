@@ -134,11 +134,8 @@ export default {
   props: {},
   components: {},
   data() {
-    //这里存放数据
     return {
-      // 当前布局
       activeLayout: "",
-      // 布局示例
       layoutList: [
         [2, 4],
         [2, 5],
@@ -153,11 +150,8 @@ export default {
       ],
     };
   },
-  //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
-  //方法集合
   methods: {
     // 节流函数
     throttle(fn, delay) {

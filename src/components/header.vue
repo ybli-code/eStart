@@ -38,26 +38,20 @@ export default {
   props: {},
   components: {},
   data() {
-    //这里存放数据
     return {
       weatherData: { now: {} },
-      currentPosition: {}, //当前位置
+      currentPosition: {},
       airType: "°C",
       timer: null,
     };
   },
-  //生命周期 - 创建完成（可以访问当前this实例）
   created() { },
-  //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     this.getCityLocal();
     this.timerGetCityLocal();
-
-    // 定时获取天气
   },
   computed: {},
   watch: {},
-  //方法集合
   methods: {
     timerGetCityLocal() {
       this.timer = setInterval(() => {

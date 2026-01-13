@@ -1,7 +1,7 @@
 {
-  "name": "estart-server",
+  "name": "e-start-server",
   "version": "1.0.0",
-  "description": "Backend for estart",
+  "description": "Backend for e-start",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"

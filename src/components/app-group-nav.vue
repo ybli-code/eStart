@@ -362,16 +362,15 @@ export default {
         //这里写要执行的内容（尤如onclick事件）
       }
     },
-    //如果手指有移动，则取消所有事件，此时说明用户只是要移动而不是长按
     gotouchmove() {
-      clearTimeout(this.timeOutEvent); //清除定时器
+      clearTimeout(this.timeOutEvent);
       this.timeOutEvent = 0;
     },
   },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
+  beforeCreate() {},
+  beforeMount() {},
+  beforeUpdate() {},
+  updated() {},
 };
 </script>
 <style lang='less'>

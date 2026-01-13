@@ -68,12 +68,10 @@ export default {
   props: {},
   components: {},
   data() {
-    //这里存放数据
     return {
-      value: "", //input绑定值
-      isShowSelect: false, //是否显示搜索引擎列表
+      value: "",
+      isShowSelect: false,
       showKeyWord: false,
-      //   搜索引擎列表
       searchList: [
         {
           key: "baidu",

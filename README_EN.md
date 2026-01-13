@@ -1,4 +1,4 @@
-# estart - Personalized Start Page
+# e-start - Personalized Start Page
 
 > A modern browser start page based on Vue.js and Express, supporting custom backgrounds, widgets, and shortcuts.
 
@@ -6,7 +6,7 @@
 
 ## 📖 Introduction
 
-**estart** is a simple, efficient, and highly customizable browser new tab page. It allows users to manage favorite websites, check weather, track to-dos, use sticky notes, and sync configurations via account login.
+**e-start** is a simple, efficient, and highly customizable browser new tab page. It allows users to manage favorite websites, check weather, track to-dos, use sticky notes, and sync configurations via account login.
 
 ## ✨ Features
 
@@ -151,7 +151,7 @@ The build artifacts are located in the `search` directory.
 ## 📂 Directory Structure
 
 ```
-estart/
+e-start/
 ├── public/             # Static assets
 ├── server/             # Backend server (Express)
 │   ├── db.json         # User data storage

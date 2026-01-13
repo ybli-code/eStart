@@ -36,7 +36,7 @@ stages:
         name: publish_general_artifacts
         displayName: 上传制品
         dependArtifact: BUILD_ARTIFACT
-        artifactName: search
+        artifactName: e-start-web
         notify: []
         strategy:
           retry: '0'
@@ -50,18 +50,24 @@ stages:
             - f19b94c6-6c8f-4882-a9da-095128431c9e
         deployArtifact:
           - source: build
-            name: eStart
+            name: e-start-web
             target: ~/gitee_go/deploy
             dependArtifact: BUILD_ARTIFACT
         script:
-          - '# 功能：部署脚本会在部署主机组的每台机器上执行'
-          - '# 使用场景：先将制品包解压缩到指定目录中，再执行启动脚本deploy.sh，脚本示例地址：https://gitee.com/gitee-go/spring-boot-maven-deploy-case/blob/master/deploy.sh'
-          - rm -rf /www/wwwroot/e-start/search
-          - tar zxvf ~/gitee_go/deploy/eStart.tar.gz -C /www/wwwroot/e-start/
-          - cd /www/wwwroot/e-start
-          - git pull
-          - nohup bash start.sh &
-          - echo '部署完成!'
+          - '# 先进入项目目录'
+          - 'mkdir -p /www/wwwroot/e-start'
+          - 'cd /www/wwwroot/e-start'
+          - '# 更新源码 (可选，如果 start.sh 需要最新源码)'
+          - 'git pull || echo "Warning: git pull failed, using existing code."'
+          - '# 清理旧的前端产物'
+          - 'rm -rf search'
+          - '# 解压最新的前端产物'
+          - 'tar zxvf ~/gitee_go/deploy/e-start-web.tar.gz -C ./'
+          - '# 赋予启动脚本执行权限'
+          - 'chmod +x start.sh'
+          - '# 启动服务 (生产模式)'
+          - 'nohup bash start.sh production > deploy.log 2>&1 &'
+          - 'echo "部署完成! 请查看 deploy.log 获取启动详情。"'
         notify: []
         strategy:
           retry: '0'

@@ -1,5 +1,5 @@
 {
-  "name": "estart",
+  "name": "e-start",
   "version": "0.2.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,7 @@
     "dev:web": "cross-env NODE_ENV=web vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:web": "cross-env NODE_ENV=web vue-cli-service build",
+    "build:extension": "node extension/build-extension.js",
     "b": "vue-cli-service build && cross-env NODE_ENV=web vue-cli-service build"
   },
   "dependencies": {
@@ -27,8 +28,10 @@
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-router": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
+    "archiver": "^7.0.1",
     "babel-plugin-component": "^1.1.1",
     "cross-env": "^7.0.2",
+    "crx3": "^2.0.0",
     "global": "^4.4.0",
     "less": "^4.2.0",
     "less-loader": "^11.1.0",

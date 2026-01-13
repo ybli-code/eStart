@@ -1,10 +1,3 @@
-/*
- * @Author: web.王晓冬
- * @Date: 2020-10-14 12:38:18
- * @LastEditors: web.王晓冬
- * @LastEditTime: 2021-01-20 09:55:08
- * @Description: 一言
-*/
 <template>
   <div class="app-yiyan ac">
     <div
@@ -28,25 +21,20 @@ export default {
   props: {},
   components: {},
   data() {
-    //这里存放数据
     return {
       yiyan: {},
     };
   },
-  //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    // 获取一言
     this.getYiyan();
   },
-  //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   computed: {},
   watch: {},
-  //方法集合
   methods: {
     yiyanHandle() {
       this.getYiyan();
-    }, //获取一言
+    },
     getYiyan() {
       this.$http.getYiyan().then((res) => {
         this.yiyan = res || {};
@@ -56,10 +44,10 @@ export default {
       this.$message.success("一言已复制到剪切板");
     },
   },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
+  beforeCreate() {},
+  beforeMount() {},
+  beforeUpdate() {},
+  updated() {},
   beforeDestroyed() {},
 };
 </script>

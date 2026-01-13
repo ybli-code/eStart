@@ -28,11 +28,11 @@ stages:
         name: publish_general_artifacts
         displayName: 上传制品
         dependArtifact: BUILD_ARTIFACT
-        artifactName: eStart
+        artifactName: e-start-web
         strategy: {}
         dependsOn: build_nodejs
       - step: build@nodejs
-        name: build_nodejs_crx
+        name: build_nodejs_extension
         displayName: Nodejs 构建插件
         nodeVersion: 18.16.0
         commands:
@@ -40,11 +40,11 @@ stages:
           - npm config set registry https://registry.npmmirror.com
           - ''
           - '# 执行编译命令'
-          - npm install && npm run build
+          - npm install && npm run build:extension
         artifacts:
-          - name: BUILD_ARTIFACT
+          - name: EXTENSION_ARTIFACT
             path:
-              - newTabs/dist
+              - extension/dist
         caches:
           - ~/.npm
           - ~/.yarn
@@ -52,14 +52,14 @@ stages:
         strategy:
           retry: '0'
       - step: publish@general_artifacts
-        name: publish_general_artifacts_crx
+        name: publish_general_artifacts_extension
         displayName: 上传制品_插件
-        dependArtifact: BUILD_ARTIFACT
-        artifactName: eStart_crx
+        dependArtifact: EXTENSION_ARTIFACT
+        artifactName: e-start-extension
         notify: []
         strategy:
           retry: '0'
-        dependsOn: build_nodejs_crx
+        dependsOn: build_nodejs_extension
   - name: release
     displayName: 发布
     strategy: naturally
@@ -68,14 +68,14 @@ stages:
       - step: publish@release_artifacts
         name: publish_release_artifacts
         displayName: 发布
-        dependArtifact: eStart
+        dependArtifact: e-start-web
         version: 1.0.0.0
         autoIncrement: true
         strategy: {}
       - step: publish@release_artifacts
-        name: publish_release_artifacts_crx
+        name: publish_release_artifacts_extension
         displayName: 发布_插件
-        dependArtifact: eStart_crx
+        dependArtifact: e-start-extension
         version: 1.0.0.0
         autoIncrement: true
         notify: []

@@ -1,10 +1,3 @@
-/*
- * @Author: web.王晓冬
- * @Date: 2020-10-10 10:04:55
- * @LastEditors: itab.link
- * @LastEditTime: 2022-01-12 20:56:02
- * @Description: file content
-*/
 <template>
   <div @contextmenu="doNothing()" class="app-box" :class="themeMode">
     <div class="app-bg" :style="{ filter: `blur(${$store.state.setContent.bgBlur}px)` }">
@@ -49,17 +42,13 @@ export default {
     Home,
   },
   data() {
-    //这里存放数据
     return {
       imgList: imgList,
       videoList: videoList,
     };
   },
-  //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-
   },
-  //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     document.querySelector("html").classList = this.themeMode;
   },
@@ -68,14 +57,12 @@ export default {
       let wallpaper = this.imgList[0];
       wallpaper.type = 0;
       let storeWallpaper = this.$store.state.wallpaper;
-      // 确保 wallpaper 存在且有有效的 src
       if (storeWallpaper && storeWallpaper.src) {
         return storeWallpaper;
       }
       return wallpaper;
     },
     themeMode() {
-      // 如果设置跟随日出日落
       if (this.$store.state.setContent.sunrise) {
         if (this.$store.state.moment == "d") {
           return "light";
@@ -87,12 +74,10 @@ export default {
     },
   },
   watch: {
-    // 给html添加主题颜色
     themeMode(val) {
       document.querySelector("html").classList = val;
     },
   },
-  //方法集合
   methods: {
     videoError() {
       this.$store.commit("setWallpaper", this.imgList[0]);

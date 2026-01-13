@@ -1,8 +1,6 @@
 .DS_Store
 node_modules
 /search
-/newTabs/dist/*
-newTabs.zip
 
 # local env files
 .env.local
@@ -26,3 +24,4 @@ pnpm-debug.log*
 # ai prompt
 /prompt
 server/db.json
+extension/dist/*

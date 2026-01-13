@@ -22,7 +22,7 @@ module.exports = {
     },
   },
   // 构建输入文件夹
-  outputDir: process.env.NODE_ENV == 'web' ? 'search' : 'newTabs/dist',
+  outputDir: process.env.NODE_ENV == 'web' ? 'search' : 'dist',
 
   css: {
     // 是否使用css扩展

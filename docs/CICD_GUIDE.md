@@ -35,7 +35,7 @@ Gitee Go 的 SSH 插件主要用于执行远程命令。传输构建文件 (`rel
           - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           - chmod 600 ~/.ssh/id_rsa
           - ssh-keyscan -H 1.2.3.4 >> ~/.ssh/known_hosts  # 替换为您的服务器IP
-          - scp release.tar.gz root@1.2.3.4:/www/wwwroot/estart/
+          - scp release.tar.gz root@1.2.3.4:/www/wwwroot/e-start/
 ```
 *(注意替换 `root`, `1.2.3.4` 和目录路径)*
 
@@ -54,7 +54,7 @@ your_domain.com {
 
     # 2. 前端静态文件托管
     handle {
-        root * /www/wwwroot/estart/search
+        root * /www/wwwroot/e-start/search
         # 开启文件服务
         file_server
         # SPA 单页应用路由重定向：如果找不到文件，统一返回 index.html
