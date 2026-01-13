@@ -33,6 +33,15 @@ axios.interceptors.response.use(response => {
     store.commit('setUserInfo', null)
   }
   return response.data
+}, error => {
+  // 服务不可用或网络错误时的降级处理
+  console.error('API Error:', error)
+  if (!error.response) {
+    Message.warning('无法连接到服务器，已自动切换到离线模式')
+  } else if (error.response.status >= 500) {
+    Message.error('服务器繁忙，请稍后再试')
+  }
+  return Promise.reject(error)
 })
 
 // let baseUrl = 'http://localhost:8081' //振兴

@@ -1,6 +1,6 @@
 {
   "name": "e-start",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -8,6 +8,7 @@
     "dev:web": "cross-env NODE_ENV=web vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:web": "cross-env NODE_ENV=web vue-cli-service build",
+    "build:extension:frontend": "vue-cli-service build --mode extension",
     "build:extension": "node extension/build-extension.js",
     "b": "vue-cli-service build && cross-env NODE_ENV=web vue-cli-service build"
   },

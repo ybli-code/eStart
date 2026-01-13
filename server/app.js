@@ -9,7 +9,23 @@ const iconv = require('iconv-lite');
 const app = express();
 const PORT = 8081;
 
-app.use(cors());
+// --- Security Headers ---
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+});
+
+// --- CORS Configuration ---
+app.use(cors({
+    origin: true, // Allow all origins (especially for browser extensions)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'token', 'Authorization'],
+    credentials: true
+}));
+
 // 增加 limit 配置，允许最大 50MB 的 JSON 数据
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));

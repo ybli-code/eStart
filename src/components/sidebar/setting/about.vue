@@ -3,6 +3,7 @@
     <section class="set-section mt20">
       <h2>关于</h2>
       <ul class="set-about">
+        <li>当前版本: v{{ version }}</li>
         <li>
           <a href="/" target="_blank"> 隐私政策 </a>
         </li>
@@ -39,6 +40,7 @@ export default {
   components: {},
   data() {
     return {
+      version: process.env.VUE_APP_VERSION,
       visible: false,
       title: "捐助我",
     };

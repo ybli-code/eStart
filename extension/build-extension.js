@@ -5,6 +5,9 @@ const archiver = require('archiver');
 const crx3 = require('crx3');
 
 const rootDir = path.resolve(__dirname, '..');
+const versionConfig = JSON.parse(fs.readFileSync(path.resolve(rootDir, 'version.json'), 'utf8'));
+const version = versionConfig.version;
+
 const distDir = path.resolve(rootDir, 'dist');
 const extensionDistDir = path.resolve(__dirname, 'dist');
 const keyPath = path.resolve(__dirname, 'key.pem');
@@ -18,9 +21,9 @@ const browsers = [
 ];
 
 async function build() {
-  console.log('Building Vue project...');
-  // Ensure we are building for production and targeting web
-  execSync('npm run build', { cwd: rootDir, stdio: 'inherit' });
+  console.log('Building Vue project for extension...');
+  // Use specific build mode for extension to inject https://estart.top
+  execSync('npm run build:extension:frontend', { cwd: rootDir, stdio: 'inherit' });
 
   if (!fs.existsSync(extensionDistDir)) {
     fs.mkdirSync(extensionDistDir);
@@ -74,18 +77,25 @@ async function build() {
 }
 
 function generateManifest(browser) {
+  const iconExists = (size) => fs.existsSync(path.resolve(distDir, `icon-${size}.png`));
+  
+  const icons = {};
+  [16, 48, 128].forEach(size => {
+    if (iconExists(size)) {
+      icons[size] = `icon-${size}.png`;
+    } else {
+      icons[size] = "favicon.svg";
+    }
+  });
+
   const base = {
     manifest_version: browser.manifestVersion,
     name: "易始起始页 (e-start)",
-    version: "0.2.0",
+    version: version,
     description: "一个精美且可定制的起始页扩展。",
-    icons: {
-      "16": "favicon.svg",
-      "48": "favicon.svg",
-      "128": "favicon.svg"
-    },
-    permissions: ["storage"],
-    host_permissions: ["*://*/*"]
+    icons: icons,
+    permissions: ["storage", "unlimitedStorage"],
+    host_permissions: ["https://estart.top/*"]
   };
 
   // New Tab override is the primary feature
@@ -96,12 +106,12 @@ function generateManifest(browser) {
   if (browser.manifestVersion === 3) {
     base.action = {
       default_popup: "index.html",
-      default_icon: "favicon.svg"
+      default_icon: icons
     };
   } else {
     base.browser_action = {
       default_popup: "index.html",
-      default_icon: "favicon.svg"
+      default_icon: icons
     };
   }
 

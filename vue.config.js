@@ -5,6 +5,12 @@
  * @LastEditTime: 2021-06-10 14:02:34
  * @Description: file content
  */
+const fs = require('fs');
+const path = require('path');
+
+const versionConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'version.json'), 'utf8'));
+process.env.VUE_APP_VERSION = versionConfig.version;
+
 module.exports = {
   devServer: {
     host: "0.0.0.0",
